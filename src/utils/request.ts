@@ -1,7 +1,8 @@
 import type { Token } from "@/interface/token"
 import axios from "axios"
 const api = axios.create({
-  baseURL: "/api",
+  withCredentials: true,
+  baseURL: "/api/v1",
   timeout: 3000,
 })
 

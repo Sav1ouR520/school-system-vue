@@ -1,10 +1,10 @@
 <template>
   <indexItem :title="switchform.title">
     <template v-slot:form>
-      <keep-alive :include="['loginForm', 'registerForm']">
+      <!-- <keep-alive :include="['loginForm', 'registerForm']"> -->
         <loginForm v-if="switchform.url === 'login'"></loginForm>
         <registerForm v-else-if="switchform.url === 'register'"></registerForm>
-      </keep-alive>
+      <!-- </keep-alive> -->
     </template>
     <template v-slot:info>
       <div text-sm flex>
@@ -17,14 +17,20 @@
 
 <script setup lang="ts">
 import { SwitchForm } from "@/stores/SwitchForm"
+import { Captcha } from '@/stores/Captcha'
+const captcha = Captcha()
 const switchform = SwitchForm()
 switchform.setForm("login")
 const change = () => {
   if (switchform.url === "login") {
     switchform.setForm("register")
-  }
-  else if (switchform.url === "register") {
+  } else if (switchform.url === "register") {
     switchform.setForm("login")
   }
+  captcha.reset()
 }
+
+onBeforeMount(() => {
+  captcha.reset()
+})
 </script>

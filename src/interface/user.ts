@@ -3,11 +3,11 @@ import type { FormItemRule } from "element-plus"
 export type loginUser = {
   account: string
   password: string
+  captcha: string
 }
 
 export type registerUser = loginUser & {
   repassword?: string
-  captcha:string
 }
 
 export type loginUserRule = {

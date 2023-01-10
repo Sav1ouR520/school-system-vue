@@ -3,17 +3,17 @@ import { defineStore } from "pinia"
 
 export const TokenStore = defineStore("TokenStore", {
   state: (): Token => ({
-    acceptToken: "",
+    accessToken: "",
     refreshToken: "",
   }),
   actions: {
     setTokens(token: Token) {
-      this.acceptToken = token.acceptToken
+      this.accessToken = token.accessToken
       this.refreshToken = token.refreshToken
     },
   },
   persist: {
     storage: localStorage,
-    paths: ["acceptToken", "refreshToken"],
+    paths: ["accessToken", "refreshToken"],
   },
 })

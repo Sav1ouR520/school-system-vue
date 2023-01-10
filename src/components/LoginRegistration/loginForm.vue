@@ -1,11 +1,16 @@
 <template>
-  <el-form :rules="rules" hide-required-asterisk ref="ruleFormRef" :model="formInline" label-position="top"
-    size="large">
+  <el-form :rules="rules" hide-required-asterisk ref="ruleFormRef" :model="user" label-position="top" size="large">
     <el-form-item label="账号" prop="account">
-      <el-input v-model="formInline.account" placeholder="请输入账号" />
+      <el-input v-model="user.account" placeholder="请输入账号" prefix-icon="User" />
     </el-form-item>
     <el-form-item label="密码" prop="password">
-      <el-input v-model="formInline.password" placeholder="请输入密码" type="password" />
+      <el-input v-model="user.password" placeholder="请输入密码" type="password" prefix-icon="Lock" />
+    </el-form-item>
+    <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg">
+      <div flex flex-grow>
+        <el-input class="no-radius" v-model="user.captcha"  placeholder="请输入验证码" maxlength="4" />
+        <img @click="captcha.reset()" :src="captcha.url">
+      </div>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="sumbit(ruleFormRef)">登录</el-button>
@@ -17,12 +22,14 @@
 import { login } from "@/api/user"
 import type { loginUser, loginUserRule } from "@/interface/user.js"
 import type { FormInstance } from "element-plus"
-
-// defineProps<{ url: string }>()
+import { Captcha } from '@/stores/Captcha'
+import { getCookie } from "@/api/cookie";
+const captcha = Captcha()
 const ruleFormRef = ref<FormInstance>()
-const formInline = reactive<loginUser>({
+const user = reactive<loginUser>({
   account: "",
   password: "",
+  captcha: ""
 })
 const rules = reactive<loginUserRule>({
   account: [
@@ -33,14 +40,20 @@ const rules = reactive<loginUserRule>({
     { required: true, message: "没有输入密码", trigger: "blur" },
     { required: true, message: "没有输入密码", trigger: "change" },
   ],
+  captcha: [
+    { required: true, message: "请输入验证码", trigger: "blur" },
+    { required: true, message: "请输入验证码", trigger: "change" },
+  ]
 })
 
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate(async (valid) => {
     if (valid) {
-      const data = await login(formInline)
-      ElMessage({ message: data.message, type: data["data"] ? 'success' : 'error' })
+      await getCookie()
+      const data = await login(user)
+      ElMessage({ message: data.message, type: data.data.validation ? 'success' : 'error' })
+      captcha.reset()
     }
   })
 }
@@ -49,13 +62,16 @@ const sumbit = (formEl: FormInstance | undefined) => {
 <style scoped>
 .el-form-item {
   font-weight: 700;
-  margin-top: 2.75rem;
+  margin-top: 1rem;
+}
+
+.no-radius :deep(.el-input__wrapper) {
+  border-radius: 0px
 }
 
 .el-button {
   width: 100%;
   border-radius: 9999rem;
-  margin-top: 2.75rem;
 }
 
 :deep(.el-input__wrapper) {
