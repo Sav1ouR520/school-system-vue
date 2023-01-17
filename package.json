@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.10",
+    "@vue/reactivity": "^3.2.45",
+    "@vue/shared": "^3.2.45",
     "@vueuse/core": "^9.10.0",
     "@vueuse/integrations": "^9.10.0",
     "animate.css": "^4.1.1",

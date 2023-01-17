@@ -17,8 +17,6 @@
 
 <script setup lang="ts">
 import { SwitchForm } from "@/stores/SwitchForm"
-import { Captcha } from '@/stores/Captcha'
-const captcha = Captcha()
 const switchform = SwitchForm()
 switchform.setForm("login")
 const change = () => {
@@ -27,10 +25,5 @@ const change = () => {
   } else if (switchform.url === "register") {
     switchform.setForm("login")
   }
-  captcha.reset()
 }
-
-onBeforeMount(() => {
-  captcha.reset()
-})
 </script>
