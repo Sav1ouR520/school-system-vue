@@ -8,7 +8,7 @@ const tokenStore = TokenStore()
 export const login = async (user: loginUser) => {
   await getCookie()
   const EncryptUser = { ...user, password: Encrypt(user.password) }
-  const data = await api.post("/auth/login", EncryptUser)
+  const data = await api.post("/user/login", EncryptUser)
   data.data.validation ? tokenStore.setTokens(data.data.token) : null
   return data
 }
@@ -16,9 +16,9 @@ export const login = async (user: loginUser) => {
 export const register = async (user: registerUser) => {
   await getCookie()
   const EncryptUser = { account: user.account, password: Encrypt(user.password), captcha: user.captcha }
-  return await api.post("/user/register", EncryptUser)
+  return await api.post("/user", EncryptUser)
 }
 
 export const checkAccountAvailable = async (account: string) => {
-  return await api.get(`/user/register/${account}`)
+  return await api.get(`/user/account/${account}`)
 }

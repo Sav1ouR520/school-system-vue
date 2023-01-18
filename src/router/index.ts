@@ -17,6 +17,14 @@ const router = createRouter({
       },
       component: () => import("@/views/IndexViews.vue"),
     },
+    {
+      path: "/main",
+      name: "main",
+      meta: {
+        title: "欢迎使用",
+      },
+      component: () => import("@/views/MainViews.vue"),
+    },
   ],
 })
 

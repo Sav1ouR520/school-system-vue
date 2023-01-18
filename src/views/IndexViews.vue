@@ -1,10 +1,8 @@
 <template>
-  <indexItem :title="switchform.title">
+  <loginRegistrationItem :title="switchform.title">
     <template v-slot:form>
-      <!-- <keep-alive :include="['loginForm', 'registerForm']"> -->
         <loginForm v-if="switchform.url === 'login'"></loginForm>
         <registerForm v-else-if="switchform.url === 'register'"></registerForm>
-      <!-- </keep-alive> -->
     </template>
     <template v-slot:info>
       <div text-sm flex>
@@ -12,7 +10,7 @@
         <a text-center text-blue-400 cursor-pointer @click="change()">{{ switchform.urlInfo }}</a>
       </div>
     </template>
-  </indexItem>
+  </loginRegistrationItem>
 </template>
 
 <script setup lang="ts">
