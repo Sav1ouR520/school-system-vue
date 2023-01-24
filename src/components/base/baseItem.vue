@@ -1,8 +1,9 @@
 <template>
-  <div flex flex-col>
-    <headerItem></headerItem>
-    <div flex flex-row>
-      <asideItem></asideItem>
+  <div flex flex-row h-full>
+    <optionItem></optionItem>
+    <asideItem></asideItem>
+    <div flex flex-col flex-grow>
+      <headerItem></headerItem>
       <mainItem></mainItem>
     </div>
   </div>

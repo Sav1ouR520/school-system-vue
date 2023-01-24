@@ -1,6 +1,5 @@
 <template>
   <div bg-gray flex-grow>
-    main
   </div>
 </template>
 

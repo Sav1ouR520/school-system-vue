@@ -1,16 +1,25 @@
 <template>
   <el-form :rules="rules" hide-required-asterisk ref="ruleFormRef" :model="user" label-position="top" size="large">
     <el-form-item label="账号" prop="account">
-      <el-input v-model="user.account" placeholder="请输入" prefix-icon="User" />
+      <el-input v-model="user.account" placeholder="请输入">
+        <template #prefix>
+          <i-ep-user></i-ep-user>
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item label="密码" prop="password">
-      <el-input v-model="user.password" placeholder="请输入密码" type="password" prefix-icon="Lock" show-password />
+      <el-input v-model="user.password" placeholder="请输入密码" type="password" show-password>
+        <template #prefix>
+          <i-ep-lock></i-ep-lock>
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg">
-      <div flex flex-grow>
-        <el-input class="no-radius" v-model="user.captcha"  placeholder="请输入验证码" maxlength="4" />
-        <img @click="captcha.reset()" :src="captcha.url">
-      </div>
+      <el-input class="no-radius" v-model="user.captcha" placeholder="请输入验证码" maxlength="4">
+        <template #append>
+          <img @click="captcha.reset()" :src="captcha.url">
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="sumbit(ruleFormRef)">登录</el-button>
@@ -74,5 +83,11 @@ const sumbit = (formEl: FormInstance | undefined) => {
 
 :deep(.el-input__wrapper) {
   border-radius: 9999rem;
+}
+
+:deep(.el-input-group__append) {
+  height: 40px;
+  width: 100px;
+  padding: 0;
 }
 </style>

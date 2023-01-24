@@ -1,20 +1,34 @@
 <template>
-  <el-form :rules="rules" status-icon ref="ruleFormRef" :model="user" size="large" label-position="top" >
+  <el-form :rules="rules" status-icon ref="ruleFormRef" :model="user" size="large" label-position="top">
     <el-form-item label="邮箱" prop="account" :error="captcha.emailErrorMeg">
-      <el-input v-model="user.account" placeholder="使用邮箱注册" maxlength="20" prefix-icon="User">
+      <el-input v-model="user.account" placeholder="使用邮箱注册" maxlength="20">
+        <template #prefix>
+          <i-ep-user></i-ep-user>
+        </template>
         <template #append>
-          <a cursor-pointer no-underline text-blue-500 @click.prevent="send()" >{{ captcha.getCode }}</a>
+          <a cursor-pointer no-underline text-blue-500 @click.prevent="send()">{{ captcha.getCode }}</a>
         </template>
       </el-input>
-      </el-form-item>
-      <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg" flex-grow>
-        <el-input class="no-radius" v-model.number="user.captcha" placeholder="请输入验证码" maxlength="4" />
+    </el-form-item>
+    <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg" flex-grow>
+      <el-input class="no-radius" v-model.number="user.captcha" placeholder="请输入验证码" maxlength="4"><template #prefix>
+          <i-ep-message></i-ep-message>
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item label="密码" prop="password">
-      <el-input v-model="user.password" placeholder="密码需要由至少8位大小写、数字组合" type="password" maxlength="30" prefix-icon="Lock" />
+      <el-input v-model="user.password" placeholder="密码需要由至少8位大小写、数字组合" type="password" maxlength="30">
+        <template #prefix>
+          <i-ep-lock></i-ep-lock>
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item label="确认密码" prop="repassword">
-      <el-input v-model="user.repassword" placeholder="再输入一次密码" type="password" maxlength="30" prefix-icon="Lock" />
+      <el-input v-model="user.repassword" placeholder="再输入一次密码" type="password" maxlength="30">
+        <template #prefix>
+          <i-ep-lock></i-ep-lock>
+        </template>
+      </el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="sumbit(ruleFormRef)">注册账号</el-button>
@@ -25,7 +39,7 @@
 <script setup lang="ts">
 import { checkAccountAvailable, register } from "@/api/user"
 import type { registerUser, registerUserRule } from "@/interface/user"
-import type {FormInstance }from "element-plus"
+import type { FormInstance } from "element-plus"
 import { sendCode } from "@/api/email"
 import { SwitchForm } from "@/stores/SwitchForm"
 import { Captcha } from '@/stores/Captcha'
@@ -45,12 +59,12 @@ const accountInfo = { account: "", message: "" }
 const send = async () => {
   const res = await ruleFormRef.value?.validateField('account')
   if (res) {
-    if (captcha.leftTime <= 0){
-    sendCode(user.account)
+    if (captcha.leftTime <= 0) {
+      sendCode(user.account)
       captcha.countDown()
     } else {
       captcha.emailErrorMeg = `还需等待${captcha.leftTime}s,才能重新发送验证码`
-      setTimeout(() => { captcha.emailErrorMeg =""},1000)
+      setTimeout(() => { captcha.emailErrorMeg = "" }, 1000)
     }
   }
 }

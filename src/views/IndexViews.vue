@@ -5,8 +5,8 @@
         <registerForm v-else-if="switchform.url === 'register'"></registerForm>
     </template>
     <template v-slot:info>
-      <div text-sm flex>
-        <p m-0>{{ switchform.info }}</p>
+      <div flex m-0 text-3.5 font-bold>
+        <p opacity-75>{{ switchform.info }}</p>
         <a text-center text-blue-400 cursor-pointer @click="change()">{{ switchform.urlInfo }}</a>
       </div>
     </template>

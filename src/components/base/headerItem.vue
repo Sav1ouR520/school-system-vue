@@ -1,6 +1,5 @@
 <template>
-  <div bg-blue flex-grow>
-    header
+  <div bg-blue h-30>
   </div>
 </template>
 
