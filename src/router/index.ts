@@ -1,3 +1,4 @@
+import { TokenStore } from "@/stores/TokenStore"
 import { createRouter, createWebHistory } from "vue-router"
 
 declare module "vue-router" {
@@ -16,6 +17,11 @@ const router = createRouter({
         title: "登录",
       },
       component: () => import("@/views/IndexViews.vue"),
+      beforeEnter: (to, from, next) => {
+        const tokenStore = TokenStore()
+        if (tokenStore.verification) next({ name: "main" })
+        else next()
+      },
     },
     {
       path: "/main",
@@ -24,6 +30,11 @@ const router = createRouter({
         title: "欢迎使用",
       },
       component: () => import("@/views/MainViews.vue"),
+      beforeEnter: (to, from, next) => {
+        const tokenStore = TokenStore()
+        if (tokenStore.verification) next()
+        else next({ name: "login" })
+      },
     },
   ],
 })

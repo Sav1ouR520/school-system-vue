@@ -41,9 +41,10 @@ import { checkAccountAvailable, register } from "@/api/user"
 import type { registerUser, registerUserRule } from "@/interface/user"
 import type { FormInstance } from "element-plus"
 import { sendCode } from "@/api/email"
-import { SwitchForm } from "@/stores/SwitchForm"
-import { Captcha } from '@/stores/Captcha'
+import { SwitchForm } from "@/stores/SwitchForm.js"
+import { Captcha } from '@/stores/Captcha.js'
 
+// === 表单验证 ===
 const captcha = Captcha()
 const switchform = SwitchForm()
 const ruleFormRef = ref<FormInstance>()
@@ -55,7 +56,7 @@ const initialState = () => ({
 })
 const user = reactive<registerUser>(initialState())
 const accountInfo = { account: "", message: "" }
-
+captcha.countDown()
 const send = async () => {
   const res = await ruleFormRef.value?.validateField('account')
   if (res) {
@@ -71,7 +72,7 @@ const send = async () => {
 
 const checkAvailable = useDebounceFn((value: any, callback: Function) => {
   checkAccountAvailable(value).then((res) => {
-    if (res.data.available) {
+    if (res.action) {
       accountInfo.message = ""
       callback()
     } else {
@@ -139,7 +140,7 @@ const sumbit = (formEl: FormInstance | undefined) => {
   formEl.validate(async (valid) => {
     if (valid) {
       const data = await register(user)
-      if (data.data['validation']) {
+      if (data.action) {
         ElMessage({ message: data.message, type: 'success' })
         // Object.assign(user, initialState());
         switchform.setForm("login")
@@ -149,6 +150,8 @@ const sumbit = (formEl: FormInstance | undefined) => {
     }
   })
 }
+// ===============
+
 </script>
 
 <style scoped>

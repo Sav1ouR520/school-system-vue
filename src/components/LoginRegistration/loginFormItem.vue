@@ -30,8 +30,11 @@
 <script setup lang="ts">
 import { login } from "@/api/user"
 import type { loginUser, loginUserRule } from "@/interface/user.js"
-import { Captcha } from '@/stores/Captcha'
+import { Captcha } from '@/stores/Captcha.js'
 import type { FormInstance } from "element-plus";
+
+// === 表单验证 ===
+const router = useRouter()
 const captcha = Captcha()
 const ruleFormRef = ref<FormInstance>()
 const user = reactive<loginUser>({
@@ -59,11 +62,17 @@ const sumbit = (formEl: FormInstance | undefined) => {
   formEl.validate(async (valid) => {
     if (valid) {
       const data = await login(user)
-      ElMessage({ message: data.message, type: data.data.validation ? 'success' : 'error' })
-      captcha.reset()
+      ElMessage({ message: data.message, type: data.action ? 'success' : 'error' })
+      if (data.action) {
+        router.push({ name: 'main' })
+      } else {
+        captcha.reset()
+      }
     }
   })
 }
+// ===============
+
 </script>
 
 <style scoped>

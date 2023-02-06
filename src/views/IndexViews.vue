@@ -1,8 +1,8 @@
 <template>
   <loginRegistrationItem :title="switchform.title">
     <template v-slot:form>
-        <loginForm v-if="switchform.url === 'login'"></loginForm>
-        <registerForm v-else-if="switchform.url === 'register'"></registerForm>
+        <loginFormItem v-if="switchform.url === 'login'"></loginFormItem>
+        <registerFormItem v-else-if="switchform.url === 'register'"></registerFormItem>
     </template>
     <template v-slot:info>
       <div flex m-0 text-3.5 font-bold>
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { SwitchForm } from "@/stores/SwitchForm"
+import { SwitchForm } from "@/stores/SwitchForm.js"
 const switchform = SwitchForm()
 switchform.setForm("login")
 const change = () => {

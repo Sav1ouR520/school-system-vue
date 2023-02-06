@@ -26,4 +26,8 @@ export const Captcha = defineStore("Captcha", {
       }, 1000)
     },
   },
+  persist: {
+    storage: localStorage,
+    paths: ["getCode", "leftTime"],
+  },
 })

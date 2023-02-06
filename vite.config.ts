@@ -15,7 +15,10 @@ import electron from "vite-plugin-electron"
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    proxy: { "/api": "http://localhost:3000" },
+    proxy: {
+      "/api": "http://localhost:3000",
+      "/data": "http://localhost:3000",
+    },
   },
   plugins: [
     AutoImport({

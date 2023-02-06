@@ -1,6 +1,8 @@
-import type { Token } from "@/interface/token"
+import { TokenStore } from "@/stores/TokenStore"
+import type { AxiosResponse, AxiosRequestConfig } from "axios"
 import axios from "axios"
-const api = axios.create({
+
+const request = axios.create({
   withCredentials: true,
   baseURL: "/api/v1",
   timeout: 3000,
@@ -16,13 +18,15 @@ declare module "axios" {
   export function create(config?: AxiosRequestConfig): AxiosInstance
 }
 
-api.interceptors.request.use(
+request.interceptors.request.use(
   config => {
     if (config?.headers) {
-      const tokenStore = localStorage.getItem("TokenStore")
-      if (tokenStore) {
-        const token: Token = JSON.parse(tokenStore)
-        config.headers.Authorization = token.acceptToken
+      const tokenStore = TokenStore()
+      if (tokenStore.verification) {
+        config.headers.Authorization = "Bearer " + tokenStore.accessToken
+      }
+      if (config.url === "/user/refresh") {
+        config.headers.Authorization = "Bearer " + tokenStore.refreshToken
       }
     }
     return config
@@ -30,17 +34,39 @@ api.interceptors.request.use(
   error => Promise.reject(error),
 )
 
-api.interceptors.response.use(
+request.interceptors.response.use(
   response => {
-    if (response.status === 200 || response.status === 201) {
-      return Promise.resolve(response.data)
-    } else {
-      return Promise.reject(response.data)
-    }
+    return response
   },
   error => {
+    if (error.response.status === 401) {
+      const tokenStore = TokenStore()
+      if (tokenStore.outOfDate) {
+        tokenStore.refresh()
+      } else {
+        tokenStore.$reset()
+      }
+    }
     return Promise.reject(error.response)
   },
 )
 
+export type Response<T = any> = {
+  data?: T
+  action: boolean
+  message: string
+}
+
+const api = <T>(config: AxiosRequestConfig) => {
+  return new Promise<Response<T>>((res, rej) => {
+    request
+      .request<Response<T>>(config)
+      .then(response => {
+        res(response.data)
+      })
+      .catch((err: any) => {
+        rej(err)
+      })
+  })
+}
 export default api

@@ -1,4 +1,4 @@
 import api from "@/utils/request"
 export const sendCode = async (to: string) => {
-  return await api.post("/email", { to })
+  return await api({ url: "/email", data: { to }, method: "POST" })
 }

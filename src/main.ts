@@ -7,11 +7,15 @@ import "@unocss/reset/tailwind.css"
 import "animate.css"
 import "uno.css"
 import "@/assets/css/style.css"
+import VueCropper from "vue-cropper"
+import "vue-cropper/dist/index.css"
+// document.onselectstart = () => false
 
 const app = createApp(App)
 const pinia = createPinia()
 
 pinia.use(piniaPluginPersistedstate)
+app.use(VueCropper)
 app.use(pinia)
 app.use(router)
 app.mount("#app")
