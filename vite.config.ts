@@ -18,6 +18,7 @@ export default defineConfig({
     proxy: {
       "/api": "http://localhost:3000",
       "/data": "http://localhost:3000",
+      "/socket.io": "http://localhost:3000",
     },
   },
   plugins: [

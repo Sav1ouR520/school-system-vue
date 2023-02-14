@@ -1,12 +1,11 @@
 <template>
-  <div flex flex-col :style="asiderWidth" ref="aside">
-    <asideHeaderItem></asideHeaderItem>
-    <keep-alive>
-      <div class="scrollBar" flex-grow>
+  <div flex flex-col bg-white :style="asiderWidth" ref="aside">
+    <el-scrollbar>
+      <keep-alive>
         <asideGroupItem v-if="switchAside.item === 'group'"></asideGroupItem>
         <asideTaskItem v-else-if="switchAside.item === 'task'"></asideTaskItem>
-      </div>
-    </keep-alive>
+      </keep-alive>
+    </el-scrollbar>
   </div>
   <div absolute h-full>
     <div relative top-0 h-full bg-gray-400 :style="separatorStyle" ref="separator">
@@ -150,13 +149,3 @@ watch(pressed, () => {
   }
 })
 </script>
-
-<style scoped>
-.scrollBar {
-  overflow: overlay;
-}
-
-.scrollBar::-webkit-scrollbar {
-  display: none;
-}
-</style>

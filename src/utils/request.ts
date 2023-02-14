@@ -1,5 +1,5 @@
 import { TokenStore } from "@/stores/TokenStore"
-import type { AxiosResponse, AxiosRequestConfig } from "axios"
+import type { AxiosRequestConfig } from "axios"
 import axios from "axios"
 
 const request = axios.create({
@@ -51,16 +51,18 @@ request.interceptors.response.use(
   },
 )
 
-export type Response<T = any> = {
+export type ResponseData<T = any> = {
+  statusCode: number
   data?: T
   action: boolean
   message: string
+  timestamp: Date
 }
 
 const api = <T>(config: AxiosRequestConfig) => {
-  return new Promise<Response<T>>((res, rej) => {
+  return new Promise<ResponseData<T>>((res, rej) => {
     request
-      .request<Response<T>>(config)
+      .request<ResponseData<T>>(config)
       .then(response => {
         res(response.data)
       })

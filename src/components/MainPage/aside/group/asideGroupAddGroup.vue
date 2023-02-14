@@ -1,6 +1,7 @@
 <template>
   <el-dialog v-model="dialogVisible" title="添加组" width="30rem" :before-close="send" draggable>
-    <el-form hide-required-asterisk status-icon :rules="rules" :model="formGroup" size="large" ref="ruleFormRef">
+    <el-form hide-required-asterisk status-icon :rules="rules" :model="formGroup" size="large" ref="ruleFormRef"
+      @submit.prevent>
       <el-form-item label="头像">
         <div flex w-full>
           <el-upload action="#" :limit="1" :auto-upload="false" :drag=true accept="image/*" ref="upload"
@@ -21,7 +22,7 @@
         </div>
       </el-form-item>
       <el-form-item label="组名" prop="name">
-        <el-input v-model="formGroup.name" maxlength="20"></el-input>
+        <el-input v-model="formGroup.name" maxlength="20" @keyup.enter="sumbit(ruleFormRef)"></el-input>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -37,7 +38,7 @@
 import { addGroup } from "@/api/group";
 import { genFileId, type FormInstance, type FormItemRule, type UploadProps, type UploadRawFile, type UploadInstance } from "element-plus"
 
-// === 使用Props 和Emits 作为父子组件通信 ===
+// === 开关diglog 使用Props和Emits作为父子组件通信[可以pinia] ===
 const dialogVisible = ref<boolean>(false)
 const props = defineProps<{ dialog: boolean }>()
 watch(props, () => {
@@ -47,7 +48,7 @@ const emit = defineEmits<{ (e: "close-dialog", value: boolean): void }>()
 const send = () => {
   emit("close-dialog", false)
 }
-// =========================================
+// ===========================================================
 
 // === 上传文件功能 ===
 const upload = ref<UploadInstance>()

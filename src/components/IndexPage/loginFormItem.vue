@@ -1,5 +1,5 @@
 <template>
-  <el-form :rules="rules" hide-required-asterisk ref="ruleFormRef" :model="user" label-position="top" size="large">
+  <el-form @submit.prevent :rules="rules" hide-required-asterisk ref="ruleFormRef" :model="user" label-position="top" size="large">
     <el-form-item label="账号" prop="account">
       <el-input v-model="user.account" placeholder="请输入">
         <template #prefix>
@@ -15,7 +15,7 @@
       </el-input>
     </el-form-item>
     <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg">
-      <el-input class="no-radius" v-model="user.captcha" placeholder="请输入验证码" maxlength="4">
+      <el-input class="no-radius" v-model="user.captcha" placeholder="请输入验证码" maxlength="4" @keyup.enter="sumbit(ruleFormRef)">
         <template #append>
           <img @click="captcha.reset()" :src="captcha.url">
         </template>

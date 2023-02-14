@@ -35,6 +35,36 @@ const router = createRouter({
         if (tokenStore.verification) next()
         else next({ name: "login" })
       },
+      children: [
+        {
+          path: "/main/group/:id",
+          name: "group",
+          component: () => import("@/views/GroupViews.vue"),
+          meta: {
+            title: "group",
+          },
+          beforeEnter: (to, from, next) => {
+            const tokenStore = TokenStore()
+            if (tokenStore.verification) next()
+            else next({ name: "login" })
+          },
+          children: [
+            {
+              path: "/main/group/:id",
+              name: "groupTask",
+              component: () => import("@/views/group/GroupMainTaskView.vue"),
+              meta: {
+                title: "group",
+              },
+              beforeEnter: (to, from, next) => {
+                const tokenStore = TokenStore()
+                if (tokenStore.verification) next()
+                else next({ name: "login" })
+              },
+            },
+          ],
+        },
+      ],
     },
   ],
 })

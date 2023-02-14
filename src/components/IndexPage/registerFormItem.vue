@@ -1,5 +1,5 @@
 <template>
-  <el-form :rules="rules" status-icon ref="ruleFormRef" :model="user" size="large" label-position="top">
+  <el-form @submit.prevent :rules="rules" status-icon ref="ruleFormRef" :model="user" size="large" label-position="top">
     <el-form-item label="邮箱" prop="account" :error="captcha.emailErrorMeg">
       <el-input v-model="user.account" placeholder="使用邮箱注册" maxlength="20">
         <template #prefix>
@@ -24,7 +24,8 @@
       </el-input>
     </el-form-item>
     <el-form-item label="确认密码" prop="repassword">
-      <el-input v-model="user.repassword" placeholder="再输入一次密码" type="password" maxlength="30">
+      <el-input v-model="user.repassword" placeholder="再输入一次密码" type="password" maxlength="30"
+        @keyup.enter="sumbit(ruleFormRef)">
         <template #prefix>
           <i-ep-lock></i-ep-lock>
         </template>

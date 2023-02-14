@@ -18,6 +18,12 @@ export const TokenStore = defineStore("TokenStore", {
     },
   },
   getters: {
+    userId: (state) => {
+      if(state.accessToken){
+        const accessToken: TokenPayload = jwt_decode(state.accessToken)
+        return accessToken.id
+      }
+    },
     verification: (state): boolean => {
       if (state.accessToken === "" || state.refreshToken === "") {
         return false

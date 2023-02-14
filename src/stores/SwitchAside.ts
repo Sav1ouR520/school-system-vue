@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
 
-export const SwitchAside = defineStore("SwitchAsideItem", {
+export const SwitchAside = defineStore("SwitchAside", {
   state: ()=> ({
     item: "group",
     optionWidth: 70,
