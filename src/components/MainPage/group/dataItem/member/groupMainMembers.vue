@@ -1,18 +1,16 @@
 <template>
-  <groupMainCard name="群成员" :num="members.data!.length" :add="addFn" :minus="minusFn" :sumbit="sumbit">
+  <groupMainCard name="群成员" :num="members.length" :modify="modifyFn" :add="addFn" :minus="minusFn" :sumbit="sumbit">
     <template v-slot:list>
       <el-scrollbar>
-        <div flex flex-col items-center v-for="member in members.data" :key="member.userId">
-          <div flex h-10 w-full items-center justify-center>
-            <div flex flex-grow items-center>
-              <el-avatar class="mr-1" :size="32" :src="userIcon(member.icon)">
-                <i-ic:baseline-image text-xl />
+        <div flex flex-col h-10 w-full items-center justify-center v-for="member in members" :key="member.userId" >
+          <div flex flex-grow px-2 justify-between items-center w-full >
+            <div flex items-center>
+              <el-avatar :size="30" :src="member.icon">
+                <i-ic:baseline-image text-sm />
               </el-avatar>
-              <span>{{ member.name }} </span>
+              <span ml-2>{{ member.name }}</span>
             </div>
-            <div flex justify-center>
-              <i-ic:outline-account-circle text-2xl :class="member.role === 'admin' ? 'text-yellow' : ''" />
-            </div>
+            <i-ic:outline-account-circle text-2xl :class="member.role === 'admin' ? 'text-yellow' : ''" />
           </div>
         </div>
       </el-scrollbar>
@@ -21,20 +19,16 @@
 </template>
 
 <script setup lang="ts">
-import { findMember } from '@/api/member';
+import { findMember } from "@/api/member";
+import { GroupPage } from "@/stores/pages/GroupPage"
 
-// === 获取id 查询组的信息 ===
-const prop = defineProps<{ id: string }>()
-const members = await findMember(prop.id)
-const userIcon = (icon: string) => {
-  return '/data/user/' + icon
-}
-const emit = defineEmits(['getMemberNumber'])
-emit('getMemberNumber', members.data!.length)
-// ==========================
+const page = GroupPage()
+const data=(await findMember(page.group.id))!.data
+const members = ref(data ? data : [])
+page.item.members= members.value.length
 
-const addFn = () => { }
-
-const minusFn = () => { }
-const sumbit = () => { }
+const modifyFn=()=>{}
+const addFn = () => {}
+const minusFn = () => {}
+const sumbit = () => {}
 </script>

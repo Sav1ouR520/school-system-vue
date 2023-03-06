@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { SwitchForm } from "@/stores/SwitchForm.js"
+import { SwitchForm } from "@/stores/switch/SwitchForm.js"
 const switchform = SwitchForm()
 switchform.setForm("login")
 const change = () => {

@@ -42,7 +42,7 @@ import { checkAccountAvailable, register } from "@/api/user"
 import type { registerUser, registerUserRule } from "@/interface/user"
 import type { FormInstance } from "element-plus"
 import { sendCode } from "@/api/email"
-import { SwitchForm } from "@/stores/SwitchForm.js"
+import { SwitchForm } from "@/stores/switch/SwitchForm.js"
 import { Captcha } from '@/stores/Captcha.js'
 
 // === 表单验证 ===

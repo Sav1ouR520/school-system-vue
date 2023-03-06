@@ -5,7 +5,7 @@ export type Member = {
   name: string
   groupId: string
   userId: string
-  role: string
+  role: "user" | "admin"
   joinTime: string
   icon: string
 }
@@ -15,7 +15,7 @@ export type MemberWithGroup = {
   name: string
   groupId: string
   userId: string
-  role: string
+  role: "user" | "admin"
   joinTime: string
   icon: string
   group: Group

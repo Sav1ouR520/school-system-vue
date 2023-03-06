@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { SwitchAside } from "@/stores/SwitchAside.js"
+import { SwitchAside } from "@/stores/switch/SwitchAside.js"
 
 // === 当选中指定图标，切换改图标颜色为绿色 同时修改其他为白色 ===
 const switchAside = SwitchAside()

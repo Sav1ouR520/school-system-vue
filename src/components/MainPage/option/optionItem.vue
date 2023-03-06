@@ -1,7 +1,7 @@
 <template>
   <div flex flex-col bg-gray-900 :style="optionWidth" v-show="switchAside.isActive">
     <div flex-grow>
-      <optionIconItem item="group" icon="i-ic:baseline-group" />
+      <optionIconItem item="group" icon="i-ic:baseline-groups" />
       <optionIconItem item="task" icon="i-carbon:task" />
     </div>
     <div>
@@ -11,7 +11,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { SwitchAside } from '@/stores/SwitchAside.js';
+import { SwitchAside } from '@/stores/switch/SwitchAside.js';
 
 // === options的宽度控制 ===
 const switchAside = SwitchAside()

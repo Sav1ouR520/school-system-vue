@@ -1,22 +1,11 @@
 <template>
-  <el-scrollbar ml-1 flex flex-col flex-grow>
-    <div flex items-center m-4 ml-3 mb-0 p-4 rounded-xl bg-white h-25>
-      <Suspense>
-        <template #default>
-          <groupHeaderItem :id="id" />
-        </template>
-      </Suspense>
-    </div>
-    <groupMainItem :id="id">
-      <template v-slot:main>
-        <RouterView />
-      </template>
-    </groupMainItem>
-    <groupBottomItem />
-  </el-scrollbar>
+  <div flex flex-col flex-grow v-if="page.group.id!==''">
+    <groupHeaderItem :key="page.group.id" />
+    <groupMainItem :key="page.group.id"/>
+  </div>
 </template>
 
 <script setup lang="ts">
-const route = useRoute()
-let id = route.params.id as string
+import { GroupPage } from "@/stores/pages/GroupPage"
+const page = GroupPage()
 </script>

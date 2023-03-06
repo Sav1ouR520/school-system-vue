@@ -1,7 +1,6 @@
 <template>
   <el-dialog v-model="dialogVisible" title="添加任务" width="30rem" :before-close="send" draggable>
-    <el-form hide-required-asterisk status-icon :rules="rules" :model="formTask" size="large" ref="ruleFormRef"
-      @submit.prevent>
+    <el-form hide-required-asterisk status-icon :rules="rules" :model="formTask" size="large" ref="ruleFormRef" @submit.prevent>
       <el-form-item label="任务名称" prop="name">
         <el-input v-model="formTask.name"></el-input>
       </el-form-item>
@@ -9,10 +8,9 @@
         <el-input v-model="formTask.introduce" type="textarea"></el-input>
       </el-form-item>
       <el-form-item label="上传文件">
-        <el-upload flex-grow class="upload-demo" ref="upload" action="#" :auto-upload="false" :disabled="!hasData"
-          :file-list="fileList" :on-change="handleChange" multiple drag>
+        <el-upload flex-grow ref="upload" action="#" :auto-upload="false" :disabled="!hasData" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" multiple drag>
           <div flex justify-between :class="hasData ? 'text-blue' : ''">
-            <div flex flex-grow justify-center rounded-xl>
+            <div flex flex-grow items-center justify-center rounded-xl>
               <i-ep:upload-filled text-8.4 />
               <p>拖拽文件到此处或点击上传</p>
             </div>
@@ -24,8 +22,8 @@
       <div flex justify-between>
         <el-form-item label="开启上传">
           <el-radio-group v-model="hasData">
-            <el-radio-button :label=true>Yes</el-radio-button>
-            <el-radio-button :label=false @click="cancelFile()">No</el-radio-button>
+            <el-radio-button :label="true">Yes</el-radio-button>
+            <el-radio-button :label="false" @click="cancelFile()">No</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <div>
@@ -38,21 +36,21 @@
 </template>
 
 <script lang="ts" setup>
-import { createTask, getTasks } from '@/api/task';
-import type { FormTask, Task } from '@/interface/task';
-import { FileZip } from '@/utils/filezip';
-import type { ResponseData } from '@/utils/request';
-import type { FormInstance, FormItemRule, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
+import { createTask } from "@/api/task"
+import type { FormTask } from "@/interface/task"
+import { GroupPage } from "@/stores/pages/GroupPage.js"
+import { FileZip } from "@/utils/filezip"
+import type { FormInstance, FormItemRule, UploadFiles, UploadInstance, UploadProps } from "element-plus"
+
 // === 开关diglog 使用Props和Emits作为父子组件通信[可以pinia] ===
 const dialogVisible = ref<boolean>(false)
-const props = defineProps<{ dialog: boolean, id: string }>()
+const props = defineProps<{ dialog: boolean }>()
 watch(props, () => {
   dialogVisible.value = props.dialog
-  formTask.groupId = props.id
 })
 const emit = defineEmits<{
-  (e: "close-dialog", value: boolean): void,
-  (e: "send-data", value: ResponseData<Task[]>): void
+  (e: "close-dialog", value: boolean): void
+  (e: "add-task"): void
 }>()
 const send = () => {
   emit("close-dialog", false)
@@ -63,13 +61,19 @@ const send = () => {
 const hasData = ref<Boolean>(false)
 const upload = ref<UploadInstance>()
 const fileList = ref<UploadFiles>([])
-const handleChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
+const handleChange: UploadProps["onChange"] = (uploadFile, uploadFiles) => {
   fileList.value = uploadFiles
 }
+
+const handleRemove: UploadProps["onRemove"] = (uploadFile, uploadFiles) => {
+  fileList.value = uploadFiles
+}
+
 // ===============
 
 // === 表单认证 ====
-const formTask = reactive<FormTask>({ name: "", introduce: "", groupId: "", file: new Blob() })
+const page = GroupPage()
+const formTask = reactive<FormTask>({ name: "", introduce: "", groupId: page.group.id, file: new Blob() })
 const ruleFormRef = ref<FormInstance>()
 type FormTaskRule = {
   [k in keyof FormTask]?: Array<FormItemRule>
@@ -97,26 +101,26 @@ const cancel = (formEl: FormInstance | undefined) => {
   hasData.value = false
   formTask.file = new Blob()
   send()
+  emit("add-task")
 }
 
 const sumbitAction = async (formEl: FormInstance) => {
-  await createTask(formTask)
+  await createTask(formTask, hasData.value && fileList.value.length !== 0)
   ElNotification({
-    title: '成功',
+    title: "成功",
     message: `成功创建任务${formTask.name}`,
     duration: 2000,
-    type: 'success',
-    position: 'top-right',
+    type: "success",
+    position: "top-right",
   })
-  refresh()
   cancel(formEl)
 }
 
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  formEl.validate(async (valid) => {
+  formEl.validate(async valid => {
     if (valid) {
-      if (hasData) {
+      if (hasData && fileList.value.length !== 0) {
         const files: File[] = []
         fileList.value.forEach(val => {
           if (val.raw) {
@@ -132,25 +136,16 @@ const sumbit = (formEl: FormInstance | undefined) => {
   })
 }
 // ===============
-
-
-// === 刷新数据 ===
-const refresh = async () => {
-  emit("send-data", await getTasks(props.id))
-}
-// ===============
-
 </script>
 
 <style scoped>
+:deep(.el-form-item--large) {
+  margin-bottom: 1.5rem;
+}
+
 :deep(.el-upload-dragger) {
   padding: 0px;
   height: 40px;
-}
-
-
-:deep(.el-form-item--large) {
-  margin-bottom: 1.5rem;
 }
 
 :deep(.el-upload-list) {

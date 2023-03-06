@@ -1,3 +1,4 @@
+import { GroupPage } from "@/stores/pages/GroupPage"
 import { TokenStore } from "@/stores/TokenStore"
 import { createRouter, createWebHistory } from "vue-router"
 
@@ -37,7 +38,7 @@ const router = createRouter({
       },
       children: [
         {
-          path: "/main/group/:id",
+          path: "/main/group",
           name: "group",
           component: () => import("@/views/GroupViews.vue"),
           meta: {
@@ -45,12 +46,14 @@ const router = createRouter({
           },
           beforeEnter: (to, from, next) => {
             const tokenStore = TokenStore()
-            if (tokenStore.verification) next()
-            else next({ name: "login" })
+            const page = GroupPage()
+            if (!tokenStore.verification) next({ name: "login" })
+            if (page.group.id === "") next({ name: "main" })
+            else next()
           },
           children: [
             {
-              path: "/main/group/:id",
+              path: "/main/group/task",
               name: "groupTask",
               component: () => import("@/views/group/GroupMainTaskView.vue"),
               meta: {
@@ -58,11 +61,29 @@ const router = createRouter({
               },
               beforeEnter: (to, from, next) => {
                 const tokenStore = TokenStore()
-                if (tokenStore.verification) next()
-                else next({ name: "login" })
+                const page = GroupPage()
+                if (!tokenStore.verification) next({ name: "login" })
+                if (page.group.id === "") next({ name: "main" })
+                if (page.hasClick) next({ name: "group" })
+                else next()
               },
             },
           ],
+        },
+        {
+          path: "user",
+          name: "user",
+          component: () => import("@/views/UserViews.vue"),
+          meta: {
+            title: "user",
+          },
+          beforeEnter: (to, from, next) => {
+            const tokenStore = TokenStore()
+            const page = GroupPage()
+            if (!tokenStore.verification) next({ name: "login" })
+            if (page.group.id === "") next({ name: "main" })
+            else next()
+          },
         },
       ],
     },

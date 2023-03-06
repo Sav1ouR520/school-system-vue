@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { login } from "@/api/user"
-import type { loginUser, loginUserRule } from "@/interface/user.js"
+import type { loginUser, loginUserRule } from "@/interface/user"
 import { Captcha } from '@/stores/Captcha.js'
 import type { FormInstance } from "element-plus";
 

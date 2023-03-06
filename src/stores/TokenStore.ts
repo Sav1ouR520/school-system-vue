@@ -10,8 +10,7 @@ export const TokenStore = defineStore("TokenStore", {
   }),
   actions: {
     setTokens(tokens: Tokens) {
-      this.accessToken = tokens.accessToken
-      this.refreshToken = tokens.refreshToken
+      this.$state = tokens
     },
     async refresh() {
       await refreshToken()

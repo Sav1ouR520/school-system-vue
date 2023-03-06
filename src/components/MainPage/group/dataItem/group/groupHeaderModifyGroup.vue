@@ -1,9 +1,16 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="添加组" width="30rem" :before-close="send" draggable>
+  <el-dialog v-model="dialogVisible" title="修改组" width="30rem" :before-close="send" draggable>
     <el-form hide-required-asterisk status-icon :rules="rules" :model="formGroup" size="large" ref="ruleFormRef" @submit.prevent>
-      <el-form-item label="组名" prop="name">
-        <el-input v-model="formGroup.name" maxlength="20" @keyup.enter="sumbit(ruleFormRef)"></el-input>
-      </el-form-item>
+      <div flex>
+        <el-form-item label="组名" prop="name">
+          <el-input v-model="formGroup.name" maxlength="20"></el-input>
+        </el-form-item>
+        <el-form-item label="组长" ml-4>
+          <el-select v-model="formGroup.owner" w-full placeholder="[组长转交可选项]" @click="getMember()">
+            <el-option v-for="member in members" :key="member.id" :label="member.name" :value="member.id" />
+          </el-select>
+        </el-form-item>
+      </div>
       <el-form-item label="头像">
         <div flex w-full>
           <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow>
@@ -19,14 +26,24 @@
       </el-form-item>
     </el-form>
     <template #footer>
-        <el-button @click="cancel(ruleFormRef)">取消</el-button>
-        <el-button type="primary" @click="sumbit(ruleFormRef)">确认</el-button>
+      <div flex justify-between>
+        <div>
+          <el-button type="danger" @click="remove()">删除组</el-button>
+        </div>
+        <div>
+          <el-button @click="cancel(ruleFormRef)">取消修改</el-button>
+          <el-button type="primary" @click="sumbit(ruleFormRef)">确认修改</el-button>
+        </div>
+      </div>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { addGroup } from "@/api/group"
+import { deleteGroup, modifyGroup } from "@/api/group"
+import { findMember } from "@/api/member"
+import type { Member } from "@/interface/member"
+import { GroupPage } from "@/stores/pages/GroupPage"
 import { genFileId, type FormInstance, type FormItemRule, type UploadProps, type UploadRawFile, type UploadInstance } from "element-plus"
 
 // === 开关diglog 使用Props和Emits作为父子组件通信[可以pinia] ===
@@ -43,6 +60,17 @@ const send = () => {
   emit("close-dialog", false)
 }
 // ===========================================================
+
+// === 获取数据 ===
+const router = useRouter()
+const page = GroupPage()
+await page.getGroup()
+const members = ref<Member[]>([])
+const getMember = async () => {
+  const data = (await findMember(page.group.id)).data
+  if (data) members.value = data
+}
+// ===============
 
 // === 上传文件功能 ===
 const upload = ref<UploadInstance>()
@@ -89,7 +117,7 @@ const cancelImage = () => {
 // ===================
 
 // === 表单认证 ====
-const formGroup = reactive({ name: "" })
+const formGroup = reactive({ id: page.group.id, name: page.group.name, owner: null })
 const ruleFormRef = ref<FormInstance>()
 const rules = reactive<{ name: Array<FormItemRule> }>({
   name: [
@@ -97,6 +125,18 @@ const rules = reactive<{ name: Array<FormItemRule> }>({
     { required: true, message: "组名不能为空", trigger: "change" },
   ],
 })
+const remove = async () => {
+  await deleteGroup(page.group.id)
+  page.$reset()
+  router.push(`/main`)
+  ElNotification({
+    title: "成功",
+    message: `成功删除组${formGroup.name}`,
+    duration: 2000,
+    type: "success",
+    position: "top-right",
+  })
+}
 const cancel = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   cancelImage()
@@ -104,12 +144,15 @@ const cancel = (formEl: FormInstance | undefined) => {
   send()
 }
 const sumbitAction = async (formEl: FormInstance, icon?: File) => {
-  await addGroup({ ...formGroup, icon })
+  await modifyGroup({ ...formGroup, icon })
   cancel(formEl)
   emit("add-group", new Date().valueOf())
+  await page.getGroup()
+  formGroup.name = page.group.name
+  page.update = { time: new Date().valueOf(), type: "group" }
   ElNotification({
     title: "成功",
-    message: `成功创建组${formGroup.name}`,
+    message: `成功修改组${formGroup.name}`,
     duration: 2000,
     type: "success",
     position: "top-right",

@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 
-import { SwitchAside } from '@/stores/SwitchAside.js';
+import { SwitchAside } from '@/stores/switch/SwitchAside.js';
 const switchAside = SwitchAside()
 
 </script>

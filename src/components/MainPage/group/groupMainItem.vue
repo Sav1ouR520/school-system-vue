@@ -1,21 +1,19 @@
 <template>
-  <div flex m-4 ml-3 rounded-xl flex-grow>
-    <div p-4 mr-4 flex-grow rounded-xl bg-white>
-      <slot name="main"></slot>
+  <div flex flex-row overflow-hidden flex-grow>
+    <div flex-grow m-4 mr-0 mt-0 rounded-xl bg-white>
+      <el-scrollbar p-4>
+        <RouterView />
+      </el-scrollbar>
     </div>
-    <div flex flex-col class="w-1/3" max-w-100 min-w-50>
-      <div px-4 pt-2 pb-4 rounded-xl bg-white h-46 mb-4>
+    <div flex flex-col class="w-1/3">
+      <div flex-grow m-4 mt-0 p-4 pb-12 rounded-xl overflow-hidden bg-white class="h-1/2">
         <Suspense>
-          <template #default>
-            <groupMainTask :id="id" :MemberNumber="MemberNumber" />
-          </template>
+          <template #default><groupMainTask /></template>
         </Suspense>
       </div>
-      <div px-4 pt-2 pb-4 rounded-xl bg-white h-46>
-        <Suspense>
-          <template #default>
-            <groupMainMembers :id="id" @getMemberNumber="getMemberNumber" />
-          </template>
+      <div flex-grow m-4 mt-0 p-4 pb-12 rounded-xl overflow-hidden bg-white class="h-1/2">
+        <Suspense
+          ><template #default><groupMainMembers /></template>
         </Suspense>
       </div>
     </div>
@@ -23,11 +21,10 @@
 </template>
 
 <script setup lang="ts">
-// === 获取id 查询组的信息 ===
-defineProps<{ id: string }>()
-const MemberNumber = ref(0)
-const getMemberNumber = (num: number) => {
-  MemberNumber.value = num
-}
+import { GroupPage } from "@/stores/pages/GroupPage"
+
+// === 查询组的信息 ===
+const page = GroupPage()
+page.getGroup()
 // ==========================
 </script>
