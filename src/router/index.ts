@@ -28,7 +28,7 @@ const router = createRouter({
       path: "/main",
       name: "main",
       meta: {
-        title: "欢迎使用",
+        title: "main",
       },
       component: () => import("@/views/MainViews.vue"),
       beforeEnter: (to, from, next) => {

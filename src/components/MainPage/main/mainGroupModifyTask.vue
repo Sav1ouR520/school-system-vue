@@ -4,14 +4,13 @@
       <div font-bold text-2xl h-8>群任务</div>
       <div flex items-center text-2 px-2 mx-2 h-8 border-2 bg-black rounded text-white>
         <span>创建者:</span>
-        <span font-bold>{{ data!.member.name }}</span>
+        <span font-bold>{{ data!.task.member.name }}</span>
       </div>
       <div flex items-center text-2 px-2 mx-2 h-8 border-2 bg-black rounded text-white>
         <span>创建时间:</span>
         <span font-bold>{{ moment(data!.task.createTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
       </div>
       <div flex-grow></div>
-      <el-button type="primary" @click="sumbit(ruleFormRef)">修改</el-button>
     </div>
     <hr border-b-2 m-2 mb-4 />
     <el-form mx-2 hide-required-asterisk status-icon :rules="rules" :model="formTask" ref="ruleFormRef" @submit.prevent>
@@ -45,12 +44,15 @@
           </div>
         </el-upload>
       </el-form-item>
+      <el-form-item>
+        <el-button type="primary" w-full @click="sumbit(ruleFormRef)">修改</el-button>
+      </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getTasksByTaskId, modifyTask, deleteTaskFile } from "@/api/task"
+import { findTaskByTaskId, modifyTask, deleteTaskFile } from "@/api/task"
 import type { FormInstance, FormItemRule, UploadFiles, UploadInstance, UploadProps } from "element-plus"
 import moment from "moment"
 
@@ -60,7 +62,7 @@ import { GroupPage } from "@/stores/pages/GroupPage"
 
 // === 查找task信息 ===
 const page = GroupPage()
-const refreshData = async () => (await getTasksByTaskId(page.click.id)).data
+const refreshData = async () => (await findTaskByTaskId(page.click.id)).data
 const data = ref(await refreshData())
 // ===================
 

@@ -9,7 +9,7 @@
   <div flex flex-col mx-2>
     <div flex items-center text-2 px-2 h-10 border-2 rounded mb-4>
       <span w-15>创建者:</span>
-      <span font-bold flex-grow>{{ data!.member.name }}</span>
+      <span font-bold flex-grow>{{ data!.task.member.name }}</span>
     </div>
     <div flex text-2 border-2 rounded mb-4>
       <span w-15 mt-2.5 ml-2>任务简介:</span>
@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import { modifyFile, uploadFile } from "@/api/file"
-import { getTasksByTaskId } from "@/api/task"
+import { findTaskByTaskId } from "@/api/task"
 import { GroupPage } from "@/stores/pages/GroupPage"
 import { FileZip } from "@/utils/filezip"
 import type { FormInstance, FormItemRule, UploadFiles, UploadInstance, UploadProps } from "element-plus"
@@ -64,7 +64,7 @@ import moment from "moment"
 
 // === 获取数据 ===
 const page = GroupPage()
-const refreshData = async () => (await getTasksByTaskId(page.click.id)).data
+const refreshData = async () => (await findTaskByTaskId(page.click.id)).data
 const data = ref(await refreshData())
 
 const downloadPreFile = () => {
@@ -79,7 +79,7 @@ const downloadUploadFile = () => {
 const clickid = ref(page.click.id)
 page.$subscribe(
   async (mutation, state) => {
-    if (state.click.type === "task" && state.click.status === "add" && clickid.value !== state.click.id ) {
+    if (state.click.type === "task" && state.click.status === "add" && clickid.value !== state.click.id) {
       clickid.value = page.click.id
       data.value = await refreshData()
     }

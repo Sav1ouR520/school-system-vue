@@ -10,6 +10,7 @@ export type Task = {
   activeStatue: boolean
   dataPath: string | null
   createTime: Date
+  member: Member
 }
 
 export type TaskWithFile = {
@@ -38,8 +39,7 @@ export type ModifyTask = {
   file: Blob
 }
 
-export type TaskWithMemberAndFile = {
+export type TaskWithFile2 = {
   task: Task
-  member: Member
   File: File
 }

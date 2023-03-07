@@ -1,11 +1,11 @@
 <template>
-  <div flex flex-col bg-white :style="asiderWidth" ref="aside">
+  <div  flex-col bg-white :style="checkMainPageWindow() ? '' : asiderWidth" :class="[checkMainPageWindow() ? 'flex-grow' : '', checkOtherPageWindow() ? 'hidden' : 'flex']" ref="aside">
     <keep-alive>
       <asideGroupItem v-if="switchAside.item === 'group'"></asideGroupItem>
       <asideTaskItem v-else-if="switchAside.item === 'task'"></asideTaskItem>
     </keep-alive>
   </div>
-  <div absolute h-full>
+  <div absolute h-full :class="[checkMainPageWindow() ? 'hidden' : '', checkOtherPageWindow() ? 'hidden' : '']">
     <div relative top-0 h-full bg-gray-400 :style="separatorStyle" ref="separator"></div>
   </div>
 </template>
@@ -28,11 +28,11 @@ const { pressed } = useMousePressed() // 获取鼠标是否点击
 const { isOutside } = useMouseInElement(separator) // 鼠标是否在拉伸条外面
 
 const getWidthControl = () => ({
-  defalut: 380, // 侧边栏 初始宽度
-  start: 340, // 侧边栏 最小"长"宽度
+  defalut: 350, // 侧边栏 初始宽度
+  start: 320, // 侧边栏 最小"长"宽度
   end: 300, // 侧边栏 突变宽度
   min: 280, // 侧边栏 最小宽度
-  max: 500, // 侧边栏 最大宽度
+  max: 400, // 侧边栏 最大宽度
   sepWidth: 2, // 侧边栏 宽度
   sepBoldWidth: 8, // 侧边栏 变粗宽度
 })
@@ -141,4 +141,19 @@ watch(pressed, () => {
     separatorStyle.width = widthControl.sepWidth + "px"
   }
 })
+
+// === 屏幕检测 ===
+const router = useRouter()
+const routerName = ref(router.currentRoute.value.name)
+const window = useWindowSize()
+watch(router.currentRoute, () => {
+  routerName.value = router.currentRoute.value.name
+})
+const checkMainPageWindow = () => {
+  return routerName.value === "main" && window.width.value <= 768
+}
+const checkOtherPageWindow = () => {
+  return routerName.value !== "main" && window.width.value <= 768
+}
+// ============
 </script>

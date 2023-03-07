@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { deleteTask, getTasksByGroupId } from "@/api/task"
+import { deleteTask, getTaskByGroupId } from "@/api/task"
 import { GroupPage } from "@/stores/pages/GroupPage"
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 import { useRouter } from "vue-router"
@@ -25,7 +25,7 @@ import { useRouter } from "vue-router"
 // === 初始化数据 ===
 const router = useRouter()
 const page = GroupPage()
-const getTask = async () => (await getTasksByGroupId(page.group.id)).data
+const getTask = async () => (await getTaskByGroupId(page.group.id)).data
 const data = await getTask()
 const tasks = ref(data ? data : [])
 page.item.tasks.total = tasks.value.length

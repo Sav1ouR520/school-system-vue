@@ -2,7 +2,7 @@
   <div flex flex-row h-full bg-gray-100>
     <optionItem></optionItem>
     <asideItem></asideItem>
-    <RouterView  />
+    <RouterView />
   </div>
 </template>
 

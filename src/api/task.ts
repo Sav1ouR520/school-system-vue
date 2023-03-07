@@ -1,11 +1,15 @@
 import api from "@/utils/request"
-import type { TaskWithFile, FormTask, TaskWithMemberAndFile, ModifyTask } from "@/interface/task"
+import type { TaskWithFile, FormTask, Task, TaskWithFile2, ModifyTask } from "@/interface/task"
 
-export const getTasksByTaskId = async (taskId: string) => {
-  return await api<TaskWithMemberAndFile>({ url: `/task/taskId/${taskId}`, method: "get" })
+export const findtaskInfoByTaskId  = async (taskId: string) => {
+  return await api<Task>({ url: `/task/${taskId}`, method: "get" })
 }
 
-export const getTasksByGroupId = async (groupId: string) => {
+export const findTaskByTaskId = async (taskId: string) => {
+  return await api<TaskWithFile2>({ url: `/task/taskId/${taskId}`, method: "get" })
+}
+
+export const getTaskByGroupId = async (groupId: string) => {
   return await api<TaskWithFile[]>({ url: `/task/groupId/${groupId}`, method: "get" })
 }
 

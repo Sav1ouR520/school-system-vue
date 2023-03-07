@@ -1,6 +1,6 @@
 <template>
   <div m-4 p-4 rounded-xl bg-white h-25>
-    <el-page-header @back="router.push('/main')">
+    <el-page-header @back="jump()">
       <template #breadcrumb>
         <el-breadcrumb separator="/">
           <el-breadcrumb-item>Main</el-breadcrumb-item>
@@ -48,5 +48,14 @@ const close = (value: boolean) => {
 const add = (value: number) => {
   addTimer.value = value
 }
+// ================
+
+// === 更新跳转 ===
+const getBackPath = () => router.currentRoute.value.matched.slice(-2)[0].path as string
+const backUrlName = ref(getBackPath())
+const jump = () => router.push(backUrlName.value)
+watch(router.currentRoute, () => {
+  backUrlName.value = getBackPath()
+})
 // ================
 </script>

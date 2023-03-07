@@ -1,5 +1,5 @@
 <template>
-  <div flex flex-col bg-gray-900 :style="optionWidth" v-show="switchAside.isActive">
+  <div  flex-col bg-gray-900 :class="[checkOtherPageWindow() ? 'hidden' : 'flex']" :style="optionWidth" v-show="switchAside.isActive">
     <div flex-grow>
       <optionIconItem item="group" icon="i-ic:baseline-groups" />
       <optionIconItem item="task" icon="i-carbon:task" />
@@ -19,4 +19,16 @@ const optionWidth = reactive({
   width: switchAside.optionWidth + "px"
 })
 // ========================
+
+// === 屏幕检测 ===
+const router = useRouter()
+const routerName = ref(router.currentRoute.value.name)
+const window = useWindowSize()
+watch(router.currentRoute, () => {
+  routerName.value = router.currentRoute.value.name
+})
+const checkOtherPageWindow = () => {
+  return routerName.value !== "main" && window.width.value <= 768
+}
+// ============
 </script>
