@@ -2,7 +2,8 @@
   <div m-2 mt-0 flex items-center>
     <span mr-4 font-bold>{{ name }}</span>
     <span text-sm flex-grow>{{ num }}</span>
-    <div flex items-center justify-between w-12.5 v-if="page.userRole === 'admin'">
+    <div flex items-center justify-between  v-if="page.userRole === 'admin'">
+      <slot name="icon"></slot>
       <div flex items-center justify-between rounded-full cursor-pointer @click="modifyChange()" :class="modify ? 'text-blue' : ''">
         <i-ic:twotone-create />
       </div>

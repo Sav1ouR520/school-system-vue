@@ -17,7 +17,7 @@ type GroupPageInfo = {
   }
   click: {
     id: string
-    status: "modify" | "add" | null
+    status: "modify" | "add" | "check" | null
     type: "member" | "task" | null
   }
 }

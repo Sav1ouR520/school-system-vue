@@ -1,5 +1,6 @@
 import type { Group } from "./group"
 import type { File } from "./file"
+import type { Task } from "./task"
 
 export type Member = {
   id: number
@@ -9,6 +10,7 @@ export type Member = {
   role: "user" | "admin"
   joinTime: string
   icon: string
+  file: File[]
 }
 
 export type MemberWithGroup = {
@@ -22,13 +24,7 @@ export type MemberWithGroup = {
   group: Group
 }
 
-export type MemberWithFile = {
-  id: number
-  name: string
-  groupId: string
-  userId: string
-  role: "user" | "admin"
-  joinTime: string
-  icon: string
-  file: File
+export type MemberWithTask = {
+  member: Member[]
+  task: Task
 }

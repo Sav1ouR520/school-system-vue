@@ -1,6 +1,11 @@
 <template>
   <groupMainAddTask :dialog="dialogVisible" @close-dialog="close" @add-task="add" />
   <groupMainCard name="群任务" :num="tasks.length" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
+    <template #icon>
+      <div flex items-center justify-between rounded-full cursor-pointer @click="changeCheck()" :class="checkActive ? 'text-blue' : ''">
+        <i-ic:baseline-list-alt />
+      </div>
+    </template>
     <template v-slot:list>
       <el-scrollbar>
         <div items-center border border-transparent hover:border-current cursor-pointer :class="[deleteActive ? 'hover:bg-red-100' : '', modifyAcitve ? 'hover:bg-blue-100' : '', chooseList.includes(task.id) ? 'text-red' : 'text-black']" v-for="task in tasks" :key="task.id" @click="choose(task.id)">
@@ -72,10 +77,20 @@ const add = async () => {
 }
 // ================
 
+// === 查看任务情况 ===
+const checkActive = ref<boolean>(false)
+const changeCheck = () => {
+  checkActive.value = !checkActive.value
+  modifyAcitve.value = false
+  deleteActive.value = false
+}
+// ===================
+
 // === 修改任务 ===
 const modifyAcitve = ref<boolean>(false)
 const getModifyStatus = (value: boolean) => {
   modifyAcitve.value = value
+  checkActive.value = false
 }
 // ===============
 
@@ -105,6 +120,8 @@ const choose = (id: string) => {
     page.click.type = "task"
     if (modifyAcitve.value) {
       page.click.status = "modify"
+    } else if (checkActive.value) {
+      page.click.status = "check"
     } else {
       page.click.status = "add"
     }

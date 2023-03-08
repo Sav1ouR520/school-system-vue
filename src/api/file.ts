@@ -1,5 +1,5 @@
 import type { File, UpdateFile, UploadFile } from "@/interface/file"
-import type { MemberWithFile } from "@/interface/member"
+import type { MemberWithTask } from "@/interface/member"
 import api from "@/utils/request"
 
 export const uploadFile = async (data: UploadFile) => {
@@ -11,5 +11,9 @@ export const modifyFile = async (data: UpdateFile) => {
 }
 
 export const findFileBytaskId = async (taskId: string) => {
-  return await api<MemberWithFile>({ url: `/file/taskId/${taskId}`, method: "get" })
+  return await api<MemberWithTask>({ url: `/file/taskId/${taskId}`, method: "get" })
+}
+
+export const goBackFileByTaskId = async (fileId: string) => {
+  return await api({ url: `/file/${fileId}`, method: "delete" })
 }

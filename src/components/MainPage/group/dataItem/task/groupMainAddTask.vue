@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="添加任务" width="30rem" :before-close="send" draggable>
+  <el-dialog v-model="dialogVisible" title="添加任务" width="30rem" :before-close="send" draggable align-center>
     <el-form hide-required-asterisk status-icon :rules="rules" :model="formTask" size="large" ref="ruleFormRef" @submit.prevent>
       <el-form-item label="任务名称" prop="name">
         <el-input v-model="formTask.name"></el-input>

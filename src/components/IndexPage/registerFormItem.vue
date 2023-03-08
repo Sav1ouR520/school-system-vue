@@ -1,9 +1,16 @@
 <template>
   <el-form @submit.prevent :rules="rules" status-icon ref="ruleFormRef" :model="user" size="large" label-position="top">
+    <el-form-item label="密码" prop="username">
+      <el-input v-model="user.username" placeholder="请输入用户名" maxlength="20">
+        <template #prefix>
+          <i-ep-user></i-ep-user>
+        </template>
+      </el-input>
+    </el-form-item>
     <el-form-item label="邮箱" prop="account" :error="captcha.emailErrorMeg">
       <el-input v-model="user.account" placeholder="使用邮箱注册" maxlength="20">
         <template #prefix>
-          <i-ep-user></i-ep-user>
+          <i-ep-message></i-ep-message>
         </template>
         <template #append>
           <a cursor-pointer no-underline text-blue-500 @click.prevent="send()">{{ captcha.getCode }}</a>
@@ -11,7 +18,8 @@
       </el-input>
     </el-form-item>
     <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg" flex-grow>
-      <el-input class="no-radius" v-model.number="user.captcha" placeholder="请输入验证码" maxlength="4"><template #prefix>
+      <el-input class="no-radius" v-model.number="user.captcha" placeholder="请输入验证码" maxlength="4"
+        ><template #prefix>
           <i-ep-message></i-ep-message>
         </template>
       </el-input>
@@ -24,8 +32,7 @@
       </el-input>
     </el-form-item>
     <el-form-item label="确认密码" prop="repassword">
-      <el-input v-model="user.repassword" placeholder="再输入一次密码" type="password" maxlength="30"
-        @keyup.enter="sumbit(ruleFormRef)">
+      <el-input v-model="user.repassword" placeholder="再输入一次密码" type="password" maxlength="30" @keyup.enter="sumbit(ruleFormRef)">
         <template #prefix>
           <i-ep-lock></i-ep-lock>
         </template>
@@ -43,36 +50,39 @@ import type { registerUser, registerUserRule } from "@/interface/user"
 import type { FormInstance } from "element-plus"
 import { sendCode } from "@/api/email"
 import { SwitchForm } from "@/stores/switch/SwitchForm.js"
-import { Captcha } from '@/stores/Captcha.js'
+import { Captcha } from "@/stores/Captcha.js"
 
 // === 表单验证 ===
 const captcha = Captcha()
 const switchform = SwitchForm()
 const ruleFormRef = ref<FormInstance>()
 const initialState = () => ({
+  username: "",
   account: "",
   password: "",
   repassword: "",
-  captcha: ""
+  captcha: "",
 })
 const user = reactive<registerUser>(initialState())
 const accountInfo = { account: "", message: "" }
 captcha.countDown()
 const send = async () => {
-  const res = await ruleFormRef.value?.validateField('account')
+  const res = await ruleFormRef.value?.validateField("account")
   if (res) {
     if (captcha.leftTime <= 0) {
       sendCode(user.account)
       captcha.countDown()
     } else {
       captcha.emailErrorMeg = `还需等待${captcha.leftTime}s,才能重新发送验证码`
-      setTimeout(() => { captcha.emailErrorMeg = "" }, 1000)
+      setTimeout(() => {
+        captcha.emailErrorMeg = ""
+      }, 1000)
     }
   }
 }
 
 const checkAvailable = useDebounceFn((value: any, callback: Function) => {
-  checkAccountAvailable(value).then((res) => {
+  checkAccountAvailable(value).then(res => {
     if (res.action) {
       accountInfo.message = ""
       callback()
@@ -87,7 +97,7 @@ const checkAccount = (value: any, callback: any) => {
   const re = new RegExp(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/)
   if (re.test(value)) {
     if (accountInfo.account != value) {
-      accountInfo.account = value;
+      accountInfo.account = value
       checkAvailable(value, callback)
     } else {
       accountInfo.message ? callback(new Error(accountInfo.message)) : callback()
@@ -112,17 +122,21 @@ const checkRePassword = (value: any, callback: any) => {
   }
 }
 const rules = reactive<registerUserRule>({
+  username: [
+    { required: true, message: "请输入用户名", trigger: "blur" },
+    { required: true, message: "请输入用户名", trigger: "change" },
+  ],
   account: [
     { required: true, message: "请输入邮箱", trigger: "blur" },
     { required: true, message: "请输入邮箱", trigger: "change" },
     { required: true, trigger: "blur", validator: (_, value, callback) => checkAccount(value, callback) },
-    { required: true, trigger: "change", validator: (_, value, callback) => checkAccount(value, callback) }
+    { required: true, trigger: "change", validator: (_, value, callback) => checkAccount(value, callback) },
   ],
   password: [
     { required: true, message: "请输入密码", trigger: "blur" },
     { required: true, message: "请输入密码", trigger: "change" },
     { required: true, trigger: "change", validator: (_, value, callback) => checkPassword(value, callback) },
-    { required: true, trigger: "blur", validator: (_, value, callback) => checkPassword(value, callback) }
+    { required: true, trigger: "blur", validator: (_, value, callback) => checkPassword(value, callback) },
   ],
   repassword: [
     { required: true, message: "请再输入一次密码", trigger: "blur" },
@@ -133,16 +147,18 @@ const rules = reactive<registerUserRule>({
   captcha: [
     { required: true, message: "请输入验证码", trigger: "blur" },
     { required: true, message: "请输入验证码", trigger: "change" },
-  ]
+  ],
 })
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  setTimeout(() => { captcha.codeErrorMeg = '' }, 0)
-  formEl.validate(async (valid) => {
+  setTimeout(() => {
+    captcha.codeErrorMeg = ""
+  }, 0)
+  formEl.validate(async valid => {
     if (valid) {
       const data = await register(user)
       if (data.action) {
-        ElMessage({ message: data.message, type: 'success' })
+        ElMessage({ message: data.message, type: "success" })
         // Object.assign(user, initialState());
         switchform.setForm("login")
       } else {
@@ -152,7 +168,6 @@ const sumbit = (formEl: FormInstance | undefined) => {
   })
 }
 // ===============
-
 </script>
 
 <style scoped>
@@ -162,7 +177,7 @@ const sumbit = (formEl: FormInstance | undefined) => {
 }
 
 .no-radius :deep(.el-input__wrapper) {
-  border-radius: 0px
+  border-radius: 0px;
 }
 
 .el-button {

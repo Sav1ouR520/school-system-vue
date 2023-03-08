@@ -7,7 +7,8 @@ export type loginUser = {
 }
 
 export type registerUser = loginUser & {
-  repassword?: string
+  username: string
+  repassword: string
 }
 
 export type loginUserRule = {

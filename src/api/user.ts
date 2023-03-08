@@ -22,7 +22,7 @@ export const refreshToken = async () => {
 
 export const register = async (user: registerUser) => {
   await getCookie()
-  const EncryptUser = { account: user.account, password: Encrypt(user.password), captcha: user.captcha }
+  const EncryptUser = { username: user.username, account: user.account, password: Encrypt(user.password), captcha: user.captcha }
   return await api({ url: "/user", data: EncryptUser, method: "POST" })
 }
 

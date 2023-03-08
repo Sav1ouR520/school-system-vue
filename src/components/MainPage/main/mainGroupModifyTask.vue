@@ -1,21 +1,20 @@
 <template>
   <div border-2 p-2 rounded-xl border-gray-200>
-    <div flex items-center m-2 mt-0 h-10>
-      <div font-bold text-2xl h-8>群任务</div>
-      <div flex items-center text-2 px-2 mx-2 h-8 border-2 bg-black rounded text-white>
+    <div flex items-center m-2 mt-0 h-10 >
+      <div flex items-center flex-grow font-bold text-lg h-8>群任务</div>
+      <div flex items-center text-xs px-1 ml-2 h-8 border-2 bg-black rounded text-white>
         <span>创建者:</span>
         <span font-bold>{{ data!.task.member.name }}</span>
       </div>
-      <div flex items-center text-2 px-2 mx-2 h-8 border-2 bg-black rounded text-white>
-        <span>创建时间:</span>
+      <div flex items-center text-xs px-1 ml-2 h-8 border-2 bg-black rounded text-white>
+        <span>时间:</span>
         <span font-bold>{{ moment(data!.task.createTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
       </div>
-      <div flex-grow></div>
     </div>
     <hr border-b-2 m-2 mb-4 />
     <el-form mx-2 hide-required-asterisk status-icon :rules="rules" :model="formTask" ref="ruleFormRef" @submit.prevent>
-      <div flex items-center justify-center text-2 px-2 mb-4 h-8 border-2 bg-gray rounded text-white>
-        <span mr-1>任务标识:</span>
+      <div flex items-center justify-center text-xs mb-4 h-8 border-2 bg-gray rounded text-white >
+        <span mr-1>标识:</span>
         <span font-bold>[{{ data!.task.id }}]</span>
       </div>
       <el-form-item label="任务名称" prop="name">

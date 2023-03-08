@@ -1,5 +1,5 @@
 <template>
-  <div  flex-col bg-white :style="checkMainPageWindow() ? '' : asiderWidth" :class="[checkMainPageWindow() ? 'flex-grow' : '', checkOtherPageWindow() ? 'hidden' : 'flex']" ref="aside">
+  <div flex-col bg-white :style="checkMainPageWindow() ? '' : asiderWidth" :class="[checkMainPageWindow() ? 'flex-grow' : '', checkOtherPageWindow() ? 'hidden' : 'flex']" ref="aside">
     <keep-alive>
       <asideGroupItem v-if="switchAside.item === 'group'"></asideGroupItem>
       <asideTaskItem v-else-if="switchAside.item === 'task'"></asideTaskItem>
@@ -28,7 +28,7 @@ const { pressed } = useMousePressed() // 获取鼠标是否点击
 const { isOutside } = useMouseInElement(separator) // 鼠标是否在拉伸条外面
 
 const getWidthControl = () => ({
-  defalut: 350, // 侧边栏 初始宽度
+  defalut: 340, // 侧边栏 初始宽度
   start: 320, // 侧边栏 最小"长"宽度
   end: 300, // 侧边栏 突变宽度
   min: 280, // 侧边栏 最小宽度
@@ -66,6 +66,7 @@ watch(switchAside, () => {
     widthControl = getWidthControl()
     divLeft.value = optionIsActive.value ? switchAside.optionWidth.valueOf() : 0
     separatorStyle.left = divWidth.value + divLeft.value - widthControl.sepWidth / 2 + "px"
+    console.log(divLeft.value, separatorStyle.left)
   }
 })
 

@@ -3,7 +3,7 @@
     <el-form-item label="账号" prop="account">
       <el-input v-model="user.account" placeholder="请输入">
         <template #prefix>
-          <i-ep-user></i-ep-user>
+          <i-ep-message></i-ep-message>
         </template>
       </el-input>
     </el-form-item>

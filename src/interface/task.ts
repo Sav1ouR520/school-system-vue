@@ -5,7 +5,7 @@ export type Task = {
   id: string
   name: string
   introduce: string
-  createUser: string
+  memberId: string
   groupId: string
   activeStatue: boolean
   dataPath: string | null
@@ -17,7 +17,7 @@ export type TaskWithFile = {
   id: string
   name: string
   introduce: string
-  createUser: string
+  memberId: string
   groupId: string
   activeStatue: boolean
   dataPath: string | null

@@ -3,6 +3,7 @@
     <template #default>
       <mainGroupModifyTask v-if="page.click.status === 'modify'" />
       <mainGroupAddFile v-else-if="page.click.status === 'add'" />
+      <mainGroupCheckFile v-else-if="page.click.status === 'check'"/>
     </template>
   </Suspense>
 </template>

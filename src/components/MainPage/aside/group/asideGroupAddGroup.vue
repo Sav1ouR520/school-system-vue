@@ -1,15 +1,15 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="添加组" width="30rem" :before-close="send" draggable>
+  <el-dialog v-model="dialogVisible" title="添加组" width="30rem" :before-close="send" draggable align-center>
     <el-form hide-required-asterisk status-icon :rules="rules" :model="formGroup" size="large" ref="ruleFormRef" @submit.prevent>
       <el-form-item label="组名" prop="name">
         <el-input v-model="formGroup.name" maxlength="20" @keyup.enter="sumbit(ruleFormRef)"></el-input>
       </el-form-item>
       <el-form-item label="头像">
-        <div flex w-full>
-          <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow>
-            <p text-blue>拖拽文件到此处或点击上传---['可选']</p>
+        <div flex w-full items-center>
+          <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow >
+            <p text-blue>拖拽文件或点击上传['可选']</p>
           </el-upload>
-          <div v-show="option.img !== ''">
+          <div ml-2 flex items-center v-show="option.img !== ''">
             <el-button type="primary" @click="cancelImage">取消图片</el-button>
           </div>
         </div>

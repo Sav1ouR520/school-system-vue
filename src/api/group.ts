@@ -21,3 +21,11 @@ export const modifyGroup = async (data: { name: string; owner: string | null; ic
 export const deleteGroup = async (id: string) => {
   return await api({ url: `/group/${id}`, method: "delete" })
 }
+
+export const getGroupInviteCode = async (groupId: string) => {
+  return await api<{ inviteCode: string }>({ url: `/group/getCode/${groupId}`, method: "get" })
+}
+
+export const updateInviteCode = async (groupId: string) => {
+  return await api<{ inviteCode: string }>({ url: `/group/refreshCode/${groupId}`, method: "get" })
+}
