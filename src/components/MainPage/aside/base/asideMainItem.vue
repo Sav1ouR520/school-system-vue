@@ -4,6 +4,7 @@
       <div :class="icon"></div>
       <slot name="title"></slot>
     </div>
+    <slot name="add"></slot>
     <div flex text-xl mr-3 cursor-pointer @click="refresh()"> <i-ic:round-refresh /></div>
   </div>
   <slot name="content" :isActive="isActive" :timer="timer"></slot>

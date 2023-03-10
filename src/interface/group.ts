@@ -4,5 +4,5 @@ export type Group = {
   owner: string
   icon: string
   createTime: string
-  activeStatue: boolean
+  status: boolean
 }

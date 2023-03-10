@@ -3,6 +3,7 @@ import moment from "moment"
 import { defineStore } from "pinia"
 export const Captcha = defineStore("Captcha", {
   state: () => ({
+    base: "/api/v1/captcha",
     url: "/api/v1/captcha",
     codeErrorMeg: "",
     emailErrorMeg: "",
@@ -11,7 +12,7 @@ export const Captcha = defineStore("Captcha", {
   }),
   actions: {
     reset() {
-      this.url = this.url + "?" + Math.random()
+      this.url = this.base + "?" + Math.random()
     },
     countDown() {
       const { pause } = useIntervalFn(() => {

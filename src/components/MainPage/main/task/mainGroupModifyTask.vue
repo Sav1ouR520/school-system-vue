@@ -1,6 +1,6 @@
 <template>
   <div border-2 p-2 rounded-xl border-gray-200>
-    <div flex items-center m-2 mt-0 h-10 >
+    <div flex items-center m-2 mt-0 h-10>
       <div flex items-center flex-grow font-bold text-lg h-8>群任务</div>
       <div flex items-center text-xs px-1 ml-2 h-8 border-2 bg-black rounded text-white>
         <span>创建者:</span>
@@ -13,7 +13,7 @@
     </div>
     <hr border-b-2 m-2 mb-4 />
     <el-form mx-2 hide-required-asterisk status-icon :rules="rules" :model="formTask" ref="ruleFormRef" @submit.prevent>
-      <div flex items-center justify-center text-xs mb-4 h-8 border-2 bg-gray rounded text-white >
+      <div flex items-center justify-center text-xs mb-4 h-8 border-2 bg-gray rounded text-white>
         <span mr-1>标识:</span>
         <span font-bold>[{{ data!.task.id }}]</span>
       </div>
@@ -29,8 +29,8 @@
           <el-radio-button :label="false" @click="cancelFile()">关闭</el-radio-button>
         </el-radio-group>
         <div v-if="data!.task.dataPath">
-          <el-button @click="downloadFile()" type="primary" plain> 下载前置文件 </el-button>
-          <el-button @click="deleteFile()" type="danger" plain>删除前置文件</el-button>
+          <el-button @click="downloadFile()" type="primary" plain>下载</el-button>
+          <el-button @click="deleteFile()" type="danger" plain>删除</el-button>
         </div>
       </el-form-item>
       <el-form-item label="文件上传">
@@ -71,7 +71,7 @@ page.$subscribe(
   async (mutation, state) => {
     if (state.click.type === "task" && state.click.status === "modify" && clickid.value !== state.click.id) {
       clickid.value = page.click.id
-      data.value = await refreshData()
+      await getData()
     }
   },
   { detached: true, deep: true },
@@ -100,12 +100,22 @@ const downloadFile = () => {
 // ====================
 
 // === 表单验证 ===
+const getData = async () => {
+  const newData = await refreshData()
+  data.value = newData
+  const { id, name, introduce } = data.value!.task
+  formTask.id = id
+  formTask.name = name
+  formTask.introduce = introduce
+  formTask.file = new Blob()
+}
 const formTask = reactive<ModifyTask>({
-  id: data.value!.task.id,
-  name: data.value!.task.name,
-  introduce: data.value!.task.introduce,
+  id: "",
+  name: "",
+  introduce: "",
   file: new Blob(),
 })
+await getData()
 const ruleFormRef = ref<FormInstance>()
 type FormTaskRule = {
   [k in keyof ModifyTask]?: Array<FormItemRule>
@@ -134,13 +144,7 @@ const sumbitAction = async (formEl: FormInstance) => {
   cancel(formEl)
   data.value = await refreshData()
   page.update = { time: new Date().valueOf(), type: "task" }
-  ElNotification({
-    title: "成功",
-    message: `成功修改任务${formTask.name}`,
-    duration: 2000,
-    type: "success",
-    position: "top-right",
-  })
+  ElNotification({ message: `成功修改任务${formTask.name}`, type: "success" })
 }
 
 const sumbit = (formEl: FormInstance | undefined) => {
@@ -165,14 +169,8 @@ const sumbit = (formEl: FormInstance | undefined) => {
 
 const deleteFile = async () => {
   await deleteTaskFile(data.value!.task.id)
-  ElNotification({
-    title: "成功",
-    message: `成功移除${formTask.name}的文件`,
-    duration: 2000,
-    type: "success",
-    position: "top-right",
-  })
-  data.value!.task.dataPath = null
+  ElNotification({ message: `成功移除${formTask.name}的文件`, type: "success" })
+  await getData()
 }
 // ===============
 </script>

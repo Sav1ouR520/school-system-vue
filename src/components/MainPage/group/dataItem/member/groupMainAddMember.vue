@@ -2,10 +2,10 @@
   <el-dialog v-model="dialogVisible" title="添加成员" width="30rem" :before-close="send" draggable align-center>
     <div flex h-8>
       <div flex flex-grow justify-center items-center border-black bg-gray-200 rounded border-2 cursor-pointer text-black @click="successCopy()">
-        <span flex justify-end flex-grow pr-3>{{ source }}</span>
+        <span flex justify-center flex-grow>{{ source }}</span>
         <span text-1 text-gray pr-2>[点击复制]</span>
       </div>
-      <div flex items-center border-black bg-gray-200 rounded ml-2 w-8 border-2 justify-center cursor-pointer @click="refreshCode()"><i-ic:baseline-refresh text-xl text-black /></div>
+      <div v-if="page.userRole === 'admin'" flex items-center border-black bg-gray-200 rounded ml-2 w-8 border-2 justify-center cursor-pointer @click="refreshCode()"><i-ic:baseline-refresh text-xl text-black /></div>
     </div>
     <div flex justify-between text-1 text-gray>
       <div>目前只支持通过邀请码加入</div>
@@ -26,18 +26,20 @@ const dialogVisible = ref<boolean>(false)
 const props = defineProps<{ dialog: boolean }>()
 watch(props, async () => {
   dialogVisible.value = props.dialog
-  source.value = (await getGroupInviteCode(page.group.id)).data!.inviteCode
+  if (props.dialog) {
+    source.value = (await getGroupInviteCode(page.group.id)).data!.inviteCode
+  }
 })
 const emit = defineEmits<{
   (e: "close-dialog", value: boolean): void
-  (e: "add-member"): void
+  (e: "add-member", value: boolean): void
 }>()
 const send = () => {
   emit("close-dialog", false)
 }
 const close = () => {
   send()
-  emit("add-member")
+  emit("add-member", false)
 }
 
 // ===========================================================

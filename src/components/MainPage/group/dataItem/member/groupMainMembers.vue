@@ -1,6 +1,8 @@
 <template>
-  <groupMainAddMember :dialog="dialogVisible" @close-dialog="close" @add-member="add"  />
-  <groupMainCard name="群成员" :num="members.length" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit"  @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
+  <groupMainAddMember :dialog="addDialogVisible" @close-dialog="addClose" @add-member="refresh" />
+  <mainGroupModifyMember :dialog="modifyDialogVisible" @close-dialog="modifyClose" @modify-member="refresh" :memberId="memberId" />
+  <mainGroupCheckMember :dialog="checkDialogVisible" @close-dialog="checkClose" :memberId="memberId" />
+  <groupMainCard name="群成员" :num="members.length" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
     <template v-slot:list>
       <el-scrollbar>
         <div items-center border border-transparent hover:border-current cursor-pointer :class="[deleteActive ? 'hover:bg-red-100' : '', modifyAcitve ? 'hover:bg-blue-100' : '', chooseList.includes(`${member.id}`) ? 'text-red' : 'text-black']" v-for="member in members" :key="member.id" @click="choose(`${member.id}`)">
@@ -16,36 +18,82 @@
         </div>
       </el-scrollbar>
     </template>
+    <template v-slot:base>
+      <div flex items-center justify-between rounded-full cursor-pointer @click="addFn()">
+        <i-ic:outline-add />
+      </div>
+    </template>
   </groupMainCard>
 </template>
 
 <script setup lang="ts">
-import { findMember } from "@/api/member"
+import { deleteMember, findMemberByGroupId } from "@/api/member"
 import { GroupPage } from "@/stores/pages/GroupPage"
 import { SwitchAside } from "@/stores/switch/SwitchAside"
-import { useRouter } from "vue-router"
 
-const router = useRouter()
 const page = GroupPage()
-const getMember = async () => (await findMember(page.group.id))!.data
+const getMember = async () => (await findMemberByGroupId(page.group.id))!.data
 const data = await getMember()
 const members = ref(data ? data : [])
 page.item.members = members.value.length
 
-// === 打开diglog ===
+// === 打开添加的diglog ===
 const switchAside = SwitchAside()
-const dialogVisible = ref<Boolean>(false)
+const addDialogVisible = ref<Boolean>(false)
 const addFn = async () => {
-  switchAside.hasDiglog = dialogVisible.value = true
+  switchAside.hasDiglog = addDialogVisible.value = true
 }
-const close = (value: boolean) => {
-  switchAside.hasDiglog = dialogVisible.value = value
-}
-const add = async () => {
-  const data = await getMember()
-  members.value = data ? data : []
+const addClose = (value: boolean) => {
+  switchAside.hasDiglog = addDialogVisible.value = value
 }
 // ================
+
+// === 更新数据
+const refresh = async (value: boolean) => {
+  if (value) {
+    const data = await getMember()
+    members.value = data ? data : []
+  }
+}
+// ================
+
+// === 数据更改监听 ===
+const timer = ref(0)
+page.$subscribe(
+  async (mutation, state) => {
+    const updateTime = state.update.time
+    if (state.update.type === "member" && updateTime > timer.value) {
+      timer.value = updateTime
+      const data = await getMember()
+      members.value = data ? data : []
+    }
+  },
+  { detached: true, deep: true },
+)
+// ===================
+
+const memberId = ref("")
+// === 打开修改的diglog ===
+const modifyDialogVisible = ref<Boolean>(false)
+const modifyFn = (id: string) => {
+  switchAside.hasDiglog = modifyDialogVisible.value = true
+  memberId.value = id
+}
+const modifyClose = (value: boolean) => {
+  switchAside.hasDiglog = modifyDialogVisible.value = value
+}
+// =======================
+
+// === 打开查看用户信息 ===
+const checkDialogVisible = ref<Boolean>(false)
+const checkFn = (id: string) => {
+  switchAside.hasDiglog = checkDialogVisible.value = true
+  memberId.value = id
+}
+const checkClose = (value: boolean) => {
+  switchAside.hasDiglog = checkDialogVisible.value = value
+}
+// =======================
 
 // === 修改成员 ===
 const modifyAcitve = ref<boolean>(false)
@@ -75,13 +123,10 @@ const choose = (id: string) => {
       chooseList.value = chooseList.value.filter(x => x !== id)
     }
   } else {
-    router.push(`/main/group/member`)
-    page.click.id = id
-    page.click.type = "member"
     if (modifyAcitve.value) {
-      page.click.status = "modify"
+      modifyFn(id)
     } else {
-      page.click.status = "add"
+      checkFn(id)
     }
   }
 }
@@ -90,21 +135,10 @@ const choose = (id: string) => {
 // === 提交删除请求 ===
 const sumbit = async () => {
   if (chooseList.value.length !== 0) {
-    const list = chooseList.value
-    if (list.includes(page.click.id)) {
-      router.push(`/main/group`)
-      page.click.id = ""
-      page.click.type = null
-    }
+    await deleteMember(chooseList.value)
     const data = await getMember()
     members.value = data ? data : []
-    ElNotification({
-      title: "成功",
-      message: `成功删除任务`,
-      duration: 2000,
-      type: "success",
-      position: "top-right",
-    })
+    ElNotification({ message: `成功删除成员`, type: "success" })
   }
 }
 // ===================

@@ -1,4 +1,5 @@
 import { findGroupByGroupId } from "@/api/group"
+import { findMemberByUserId } from "@/api/member"
 import type { Group } from "@/interface/group"
 import { defineStore } from "pinia"
 type GroupPageInfo = {
@@ -6,10 +7,7 @@ type GroupPageInfo = {
   group: Group
   item: {
     members: number
-    tasks: {
-      total: number
-      finish: number
-    }
+    tasks: number
   }
   update: {
     type: "member" | "task" | "group" | null
@@ -30,13 +28,13 @@ export const GroupPage = defineStore("GroupPage", {
       owner: "",
       icon: "",
       createTime: "",
-      activeStatue: true,
+      status: true,
     },
     update: {
       type: null,
       time: 0,
     },
-    item: { members: 0, tasks: { total: 0, finish: 0 } },
+    item: { members: 0, tasks: 0 },
     click: {
       id: "",
       status: null,
@@ -54,8 +52,10 @@ export const GroupPage = defineStore("GroupPage", {
   actions: {
     async getGroup() {
       const state = this.$state
-      const group = (await findGroupByGroupId(this.group.id))!.data
-      this.$state = group ? { ...state, group } : this.$state
+      const data = await Promise.all([findGroupByGroupId(this.group.id), findMemberByUserId(this.group.id)])
+      const group = data[0]!.data
+      const member = data[1]!.data
+      this.$state = group ? { ...state, group, userRole: member!.role } : state
     },
   },
   persist: {

@@ -7,14 +7,14 @@
         </el-form-item>
         <el-form-item label="组长" ml-4>
           <el-select v-model="formGroup.owner" w-full placeholder="[组长转交可选项]" @click="getMember()">
-            <el-option v-for="member in members" :key="member.id" :label="member.name" :value="member.id" />
+            <el-option v-for="member in members" :key="member.id" :label="member.name" :value="member.userId" />
           </el-select>
         </el-form-item>
       </div>
       <el-form-item label="头像">
         <div flex w-full items-center>
-          <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow >
-            <p text-blue >拖拽文件或点击上传['可选']</p>
+          <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow>
+            <p text-blue>拖拽文件或点击上传['可选']</p>
           </el-upload>
           <div ml-2 flex items-center v-show="option.img !== ''">
             <el-button type="primary" @click="cancelImage">取消图片</el-button>
@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { deleteGroup, modifyGroup } from "@/api/group"
-import { findMember } from "@/api/member"
+import { findMemberByGroupId } from "@/api/member"
 import type { Member } from "@/interface/member"
 import { GroupPage } from "@/stores/pages/GroupPage"
 import { genFileId, type FormInstance, type FormItemRule, type UploadProps, type UploadRawFile, type UploadInstance } from "element-plus"
@@ -49,8 +49,11 @@ import { genFileId, type FormInstance, type FormItemRule, type UploadProps, type
 // === 开关diglog 使用Props和Emits作为父子组件通信[可以pinia] ===
 const dialogVisible = ref<boolean>(false)
 const props = defineProps<{ dialog: boolean }>()
-watch(props, () => {
+watch(props, async () => {
   dialogVisible.value = props.dialog
+  if (props.dialog) {
+    await page.getGroup()
+  }
 })
 const emit = defineEmits<{
   (e: "close-dialog", value: boolean): void
@@ -64,10 +67,9 @@ const send = () => {
 // === 获取数据 ===
 const router = useRouter()
 const page = GroupPage()
-await page.getGroup()
 const members = ref<Member[]>([])
 const getMember = async () => {
-  const data = (await findMember(page.group.id)).data
+  const data = (await findMemberByGroupId(page.group.id)).data
   if (data) members.value = data
 }
 // ===============
@@ -129,13 +131,7 @@ const remove = async () => {
   await deleteGroup(page.group.id)
   page.$reset()
   router.push(`/main`)
-  ElNotification({
-    title: "成功",
-    message: `成功删除组${formGroup.name}`,
-    duration: 2000,
-    type: "success",
-    position: "top-right",
-  })
+  ElNotification({ message: `成功删除组${formGroup.name}`, type: "success" })
 }
 const cancel = (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -150,13 +146,7 @@ const sumbitAction = async (formEl: FormInstance, icon?: File) => {
   await page.getGroup()
   formGroup.name = page.group.name
   page.update = { time: new Date().valueOf(), type: "group" }
-  ElNotification({
-    title: "成功",
-    message: `成功修改组${formGroup.name}`,
-    duration: 2000,
-    type: "success",
-    position: "top-right",
-  })
+  ElNotification({ message: `成功修改组${formGroup.name}`, type: "success" })
 }
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return

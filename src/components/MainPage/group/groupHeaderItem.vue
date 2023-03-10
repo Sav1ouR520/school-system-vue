@@ -3,8 +3,7 @@
     <el-page-header @back="jump()">
       <template #breadcrumb>
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item>Main</el-breadcrumb-item>
-          <el-breadcrumb-item>Group</el-breadcrumb-item>
+          <el-breadcrumb-item v-for="(path, index) in paths" :key="index">{{ path[0].toUpperCase()+path.slice(1) }}</el-breadcrumb-item>
         </el-breadcrumb>
       </template>
       <template #content>
@@ -16,7 +15,7 @@
         </div>
       </template>
       <template #extra>
-        <div flex items-center>
+        <div flex items-center v-if="page.group.owner === user.userId">
           <el-button type="primary" @click="open()">设置</el-button>
         </div>
         <Suspense>
@@ -32,7 +31,9 @@
 <script setup lang="ts">
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 import { GroupPage } from "@/stores/pages/GroupPage"
+import { TokenStore } from "@/stores/TokenStore"
 const page = GroupPage()
+const user = TokenStore()
 const router = useRouter()
 
 // === 打开diglog ===
@@ -51,11 +52,14 @@ const add = (value: number) => {
 // ================
 
 // === 更新跳转 ===
-const getBackPath = () => router.currentRoute.value.matched.slice(-2)[0].path as string
+const getBackPath = () => router.currentRoute.value.matched.slice(-2)[0].path
+const getPaths = () => router.currentRoute.value.matched.slice(-1)[0].path.split("/").slice(1)
+const paths = ref(getPaths())
 const backUrlName = ref(getBackPath())
 const jump = () => router.push(backUrlName.value)
 watch(router.currentRoute, () => {
   backUrlName.value = getBackPath()
+  paths.value = getPaths()
 })
 // ================
 </script>

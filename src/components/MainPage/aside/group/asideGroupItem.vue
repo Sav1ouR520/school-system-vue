@@ -1,22 +1,26 @@
 <template>
   <asideHeaderItem>
     <template #add>
-      <div flex h-12.5 items-center p-2 pl-0 cursor-pointer @click="open()">
-        <i-ic:baseline-add text-2xl text-gray-800 />
+      <div flex h-12.5 items-center p-2 pl-0 cursor-pointer>
+        <i-ic:baseline-add text-2xl @click="joinOpen()" />
       </div>
-      <asideGroupAddGroup :dialog="dialogVisible" @close-dialog="close" @add-group="add" />
+      <asideGroupJoinGroup :dialog="JoindialogVisible" @close-dialog="joinClose" @join-group="refresh" />
     </template>
   </asideHeaderItem>
   <asideMainItem>
     <template #title>
       <h1>群组</h1>
     </template>
+    <template #add>
+      <div flex text-xl cursor-pointer @click="addOpen()"><i-ic:baseline-add text-2xl /></div>
+      <asideGroupAddGroup :dialog="addDialogVisible" @close-dialog="addClose" @add-group="refresh" />
+    </template>
     <template #content="{ isActive, timer }">
       <Suspense>
         <template #default>
           <el-scrollbar>
             <keep-alive>
-              <asideGroupInfoItem v-if="isActive" :key="addTimer > timer ? addTimer : timer" />
+              <asideGroupInfoItem v-if="isActive" :key="refreshTimer > timer ? refreshTimer : timer" />
             </keep-alive>
           </el-scrollbar>
         </template>
@@ -25,19 +29,33 @@
   </asideMainItem>
 </template>
 <script setup lang="ts">
-// === 打开diglog ===
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 const switchAside = SwitchAside()
-const dialogVisible = ref<Boolean>(false)
-const addTimer = ref<number>(0)
-const open = () => {
-  switchAside.hasDiglog = dialogVisible.value = true
+
+// === 添加组的diglog ===
+const addDialogVisible = ref<Boolean>(false)
+const addOpen = () => {
+  switchAside.hasDiglog = addDialogVisible.value = true
 }
-const close = (value: boolean) => {
-  switchAside.hasDiglog = dialogVisible.value = value
-}
-const add = (value: number) => {
-  addTimer.value = value
+const addClose = (value: boolean) => {
+  switchAside.hasDiglog = addDialogVisible.value = value
 }
 // ================
+
+// === 共有的刷新数据 ===
+const refreshTimer = ref<number>(0)
+const refresh = (value: number) => {
+  refreshTimer.value = value
+}
+// ====================
+
+//  === 加入组的diglog ===
+const JoindialogVisible = ref<Boolean>(false)
+const joinOpen = () => {
+  switchAside.hasDiglog = JoindialogVisible.value = true
+}
+const joinClose = (value: boolean) => {
+  switchAside.hasDiglog = JoindialogVisible.value = value
+}
+// =======================
 </script>

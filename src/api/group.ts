@@ -29,3 +29,7 @@ export const getGroupInviteCode = async (groupId: string) => {
 export const updateInviteCode = async (groupId: string) => {
   return await api<{ inviteCode: string }>({ url: `/group/refreshCode/${groupId}`, method: "get" })
 }
+
+export const joinGroupByInviteCode = async (inviteCode: string) => {
+  return await api({ url: `/group/join/${inviteCode}`, method: "post" })
+}

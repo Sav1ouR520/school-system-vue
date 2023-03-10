@@ -1,6 +1,7 @@
 import { TokenStore } from "@/stores/TokenStore"
 import type { AxiosRequestConfig } from "axios"
 import axios from "axios"
+import router from "@/router"
 
 const request = axios.create({
   withCredentials: true,
@@ -36,13 +37,16 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
   response => {
+    console.log(router.currentRoute.value.path)
     return response
   },
-  error => {
+  async error => {
     if (error.response.status === 401) {
+      const path = router.currentRoute.value.path
       const tokenStore = TokenStore()
       if (tokenStore.outOfDate) {
-        tokenStore.refresh()
+        await tokenStore.refresh()
+        router.push(path)
       } else {
         tokenStore.$reset()
       }

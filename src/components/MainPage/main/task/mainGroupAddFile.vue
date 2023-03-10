@@ -16,7 +16,7 @@
       <textarea w-full ml-2 mt-2.5 min-h-6.5 h-40 font-bold focus:outline-none disabled bg-white :value="data!.task.introduce " />
     </div>
     <div flex w-full>
-      <div flex items-center pl-2 text-2 h-10 border-2 rounded mb-4 mr-4 class="w-1/3" v-if="data!.task.dataPath !== null">
+      <div flex items-center pl-2 text-2 h-10 border-2 rounded mb-4 mr-4 min-w-40 class="w-1/3" v-if="data!.task.dataPath !== null">
         <span w-15>前置材料:</span>
         <span font-bold>
           <el-button type="primary" text @click="downloadPreFile()">点击下载</el-button>
@@ -151,13 +151,7 @@ const sumbit = (formEl: FormInstance | undefined) => {
       }
       data.value = await refreshData()
       page.update = { time: new Date(data.value!.File.uploadTime).valueOf(), type: "task" }
-      ElNotification({
-        title: "成功",
-        message: `成功提交文件`,
-        duration: 2000,
-        type: "success",
-        position: "top-right",
-      })
+      ElNotification({ message: `成功提交文件`, type: "success" })
       cancelFile()
     }
   })

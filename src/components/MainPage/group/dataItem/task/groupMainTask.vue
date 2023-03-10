@@ -13,7 +13,7 @@
             <div flex flex-grow pl-2>
               {{ task.name }}
             </div>
-            <div flex justify-center pr-2>{{ task.file.length }}/{{ page.item.members }}</div>
+            <div flex justify-center pr-2>{{ task.file }}/{{ page.item.members }}</div>
           </div>
         </div>
       </el-scrollbar>
@@ -33,17 +33,7 @@ const page = GroupPage()
 const getTask = async () => (await getTaskByGroupId(page.group.id)).data
 const data = await getTask()
 const tasks = ref(data ? data : [])
-page.item.tasks.total = tasks.value.length
-const getFinlishTaskNumber = () => {
-  let finishTaskNumber = 0
-  tasks.value.forEach(item => {
-    if (item.file.length === page.item.members) {
-      finishTaskNumber += 1
-    }
-  })
-  return finishTaskNumber
-}
-page.item.tasks.finish = getFinlishTaskNumber()
+page.item.tasks = tasks.value.length
 // ================
 
 // === 数据更改监听 ===
@@ -55,7 +45,6 @@ page.$subscribe(
       timer.value = updateTime
       const data = await getTask()
       tasks.value = data ? data : tasks.value
-      page.item.tasks.finish = getFinlishTaskNumber()
     }
   },
   { detached: true, deep: true },
@@ -141,13 +130,7 @@ const sumbit = async () => {
     }
     const data = await getTask()
     tasks.value = data ? data : []
-    ElNotification({
-      title: "成功",
-      message: `成功删除任务`,
-      duration: 2000,
-      type: "success",
-      position: "top-right",
-    })
+    ElNotification({ message: `成功删除任务`, type: "success" })
   }
 }
 // ===================

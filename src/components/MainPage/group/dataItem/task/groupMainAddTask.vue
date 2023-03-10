@@ -50,7 +50,7 @@ watch(props, () => {
 })
 const emit = defineEmits<{
   (e: "close-dialog", value: boolean): void
-  (e: "add-task"): void
+  (e: "add-task",value:boolean): void
 }>()
 const send = () => {
   emit("close-dialog", false)
@@ -101,19 +101,16 @@ const cancel = (formEl: FormInstance | undefined) => {
   hasData.value = false
   formTask.file = new Blob()
   send()
-  emit("add-task")
 }
 
 const sumbitAction = async (formEl: FormInstance) => {
   await createTask(formTask, hasData.value && fileList.value.length !== 0)
   ElNotification({
-    title: "成功",
     message: `成功创建任务${formTask.name}`,
-    duration: 2000,
     type: "success",
-    position: "top-right",
   })
   cancel(formEl)
+  emit("add-task",true)
 }
 
 const sumbit = (formEl: FormInstance | undefined) => {

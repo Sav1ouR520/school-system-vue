@@ -67,14 +67,21 @@ const goBack = async (id: string, name: string) => {
   await goBackFileByTaskId(id)
   data.value = await getData()
   page.update = { time: new Date().valueOf(), type: "task" }
-  ElNotification({
-    title: "成功",
-    message: `成功退回${name}提交的文件`,
-    duration: 2000,
-    type: "success",
-    position: "top-right",
-  })
+  ElNotification({ message: `成功退回${name}提交的文件`, type: "success" })
 }
+
+// === 监听数据变化 ===
+const clickid = ref(page.click.id)
+page.$subscribe(
+  async (mutation, state) => {
+    if (state.click.type === "task" && state.click.status === "check" && clickid.value !== state.click.id) {
+      clickid.value = page.click.id
+      data.value = await getData()
+    }
+  },
+  { detached: true, deep: true },
+)
+// ===============
 </script>
 
 <style scoped></style>

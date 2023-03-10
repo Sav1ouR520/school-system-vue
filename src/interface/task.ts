@@ -13,17 +13,6 @@ export type Task = {
   member: Member
 }
 
-export type TaskWithFile = {
-  id: string
-  name: string
-  introduce: string
-  memberId: string
-  groupId: string
-  activeStatue: boolean
-  dataPath: string | null
-  createTime: Date
-  file: Array<File>
-}
 
 export type FormTask = {
   name: string
@@ -42,4 +31,10 @@ export type ModifyTask = {
 export type TaskWithFile2 = {
   task: Task
   File: File
+}
+
+export type TaskMain = {
+  id: string
+  name: string
+  file: number
 }

@@ -20,6 +20,9 @@
         <i-ic:baseline-check-circle-outline @click="sumbit()" />
       </div>
     </div>
+    <div flex items-center justify-between  v-else>
+      <slot name="base"> </slot>
+    </div>
   </div>
   <slot name="list"></slot>
 </template>
@@ -27,7 +30,6 @@
 import { GroupPage } from "@/stores/pages/GroupPage"
 
 const page = GroupPage()
-
 const props = defineProps<{
   name: string
   num: number

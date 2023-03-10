@@ -3,10 +3,19 @@ import type { File } from "./file"
 import type { Task } from "./task"
 
 export type Member = {
-  id: number
+  id: string
   name: string
   groupId: string
   userId: string
+  role: "user" | "admin"
+  joinTime: string
+  icon: string
+}
+
+export type MemberWithFile = {
+  id: string
+  name: string
+  groupId: string
   role: "user" | "admin"
   joinTime: string
   icon: string
@@ -14,10 +23,9 @@ export type Member = {
 }
 
 export type MemberWithGroup = {
-  id: number
+  id: string
   name: string
   groupId: string
-  userId: string
   role: "user" | "admin"
   joinTime: string
   icon: string
@@ -25,6 +33,13 @@ export type MemberWithGroup = {
 }
 
 export type MemberWithTask = {
-  member: Member[]
+  member: MemberWithFile[]
   task: Task
+}
+
+export type UploadMember = {
+  id: string
+  groupId: string
+  name?: string
+  role?: "user" | "admin"
 }

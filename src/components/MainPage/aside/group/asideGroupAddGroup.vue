@@ -6,7 +6,7 @@
       </el-form-item>
       <el-form-item label="头像">
         <div flex w-full items-center>
-          <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow >
+          <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow>
             <p text-blue>拖拽文件或点击上传['可选']</p>
           </el-upload>
           <div ml-2 flex items-center v-show="option.img !== ''">
@@ -19,8 +19,8 @@
       </el-form-item>
     </el-form>
     <template #footer>
-        <el-button @click="cancel(ruleFormRef)">取消</el-button>
-        <el-button type="primary" @click="sumbit(ruleFormRef)">确认</el-button>
+      <el-button @click="cancel(ruleFormRef)">取消</el-button>
+      <el-button type="primary" @click="sumbit(ruleFormRef)">确认</el-button>
     </template>
   </el-dialog>
 </template>
@@ -107,13 +107,7 @@ const sumbitAction = async (formEl: FormInstance, icon?: File) => {
   await addGroup({ ...formGroup, icon })
   cancel(formEl)
   emit("add-group", new Date().valueOf())
-  ElNotification({
-    title: "成功",
-    message: `成功创建组${formGroup.name}`,
-    duration: 2000,
-    type: "success",
-    position: "top-right",
-  })
+  ElNotification({ message: `成功创建组${formGroup.name}`, type: "success" })
 }
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return

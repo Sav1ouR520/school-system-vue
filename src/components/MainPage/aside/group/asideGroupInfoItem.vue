@@ -1,14 +1,15 @@
 <template>
   <div v-for="member in members" :key="member.groupId">
-    <div flex w-full h-17.5 p-2.5 bg-gray-50 hover:bg-gray-100 @click="jump(member.groupId, member.role)">
-      <div w-12.5 bg-gray rounded-full flex items-center justify-center>
-        <i-ic:baseline-group text-2xl text-white v-if="member.group.icon === null" />
-        <img rounded-full @dragstart.prevent v-else :src="iconUrl(member.group)" />
+    <div flex w-full h-17.5 p-2.5 bg-gray-50 hover:bg-gray-100 @click="jump(member.groupId)">
+      <div w-12.5  flex items-center justify-center>
+        <el-avatar :size="50" :src="iconUrl(member.group)">
+          <i-ic:baseline-image text-3xl />
+        </el-avatar>
       </div>
       <div flex-grow px-2>
         <div class="h-1/2" flex items-center>
           <div flex-grow>{{ member.group.name }}</div>
-          <div>人数: {{ group.item.members }}</div>
+          <!-- <div>人数: {{ group.item.members }}</div> -->
         </div>
         <div class="h-1/2" flex items-center></div>
       </div>
@@ -32,10 +33,9 @@ const members = ref(await getMembers())
 const router = useRouter()
 const group = GroupPage()
 const page = PageInfo()
-const jump = (groupId: string, role: "user" | "admin") => {
+const jump = (groupId: string) => {
   router.push(`/main/group`)
   group.group.id = groupId
-  group.userRole = role
   page.setPageInfo({ type: "group", id: groupId })
 }
 // ===============
