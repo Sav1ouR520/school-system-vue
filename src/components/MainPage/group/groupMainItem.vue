@@ -7,18 +7,10 @@
     </div>
     <div flex-col min-w-60 :class="[checkOtherPageWindow() ? 'flex-grow' : 'w-1/3', checkGroupPageWindow() ? 'hidden' : 'flex']">
       <div flex-grow m-4 mt-0 p-4 pb-12 rounded-xl overflow-hidden bg-white class="h-1/2">
-        <Suspense>
-          <template #default>
-            <groupMainTask />
-          </template>
-        </Suspense>
+        <groupMainTask />
       </div>
       <div flex-grow m-4 mt-0 p-4 pb-12 rounded-xl overflow-hidden bg-white class="h-1/2">
-        <Suspense>
-          <template #default>
-            <groupMainMembers />
-          </template>
-        </Suspense>
+        <groupMainMembers />
       </div>
     </div>
   </div>

@@ -3,26 +3,22 @@
     <el-page-header @back="jump()">
       <template #breadcrumb>
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item v-for="(path, index) in paths" :key="index">{{ path[0].toUpperCase()+path.slice(1) }}</el-breadcrumb-item>
+          <el-breadcrumb-item v-for="(path, index) in paths" :key="index">{{ path[0].toUpperCase() + path.slice(1) }}</el-breadcrumb-item>
         </el-breadcrumb>
       </template>
       <template #content>
         <div flex items-center>
-          <el-avatar class="mr-3" :size="32" :src="page.group.icon ? '/data/group/' + page.group.icon : null">
+          <el-avatar class="mr-3" :size="32" :src="page.group.icon ? '/data/group/' + page.group.icon : null" @dragstart.prevent>
             <i-ic:baseline-image text-xl />
           </el-avatar>
           <span font-bold>{{ page.group.name }}</span>
         </div>
       </template>
       <template #extra>
-        <div flex items-center v-if="page.group.owner === user.userId">
+        <div flex items-center mr-1.5 v-if="page.group.owner === user.userId">
           <el-button type="primary" @click="open()">设置</el-button>
         </div>
-        <Suspense>
-          <template #default>
-            <groupHeaderModifyGroup :dialog="dialogVisible" @close-dialog="close" @add-group="add" />
-          </template>
-        </Suspense>
+        <groupHeaderModifyGroup :dialog="dialogVisible" @close-dialog="close" @add-group="add" />
       </template>
     </el-page-header>
   </div>

@@ -1,26 +1,14 @@
+import type { UserPageInfo } from "@/interface/user"
 import { defineStore } from "pinia"
 
-type User = {
-  id: string
-  account: string
-  username: string
-  icon: string
-  role: string
-  registerTime: Date | string
-}
-
 export const UserPage = defineStore("UserPage", {
-  state: (): User => ({
+  state: (): UserPageInfo => ({
     id: "",
     account: "",
     username: "",
+    activeStatue: true,
     icon: "",
-    role: "",
-    registerTime: "",
+    role: "user",
+    registerTime: null,
   }),
-  actions: {
-    setUser(user: User) {
-      this.$state = user
-    },
-  },
 })

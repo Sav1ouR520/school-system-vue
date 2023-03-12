@@ -17,7 +17,7 @@
     <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg">
       <el-input class="no-radius" v-model="user.captcha" placeholder="请输入验证码" maxlength="4" @keyup.enter="sumbit(ruleFormRef)">
         <template #append>
-          <img @click="captcha.reset()" :src="captcha.url">
+          <img @click="captcha.reset()" :src="captcha.url" />
         </template>
       </el-input>
     </el-form-item>
@@ -29,20 +29,23 @@
 
 <script setup lang="ts">
 import { login } from "@/api/user"
-import type { loginUser, loginUserRule } from "@/interface/user"
-import { Captcha } from '@/stores/Captcha.js'
-import type { FormInstance } from "element-plus";
+import type { LoginUser } from "@/interface/user"
+import { Captcha } from "@/stores/Captcha.js"
+import type { FormInstance, FormItemRule } from "element-plus"
 
 // === 表单验证 ===
 const router = useRouter()
 const captcha = Captcha()
 const ruleFormRef = ref<FormInstance>()
-const user = reactive<loginUser>({
+const user = reactive<LoginUser>({
   account: "",
   password: "",
-  captcha: ""
+  captcha: "",
 })
-const rules = reactive<loginUserRule>({
+type LoginUserRule = {
+  [k in keyof LoginUser]?: Array<FormItemRule>
+}
+const rules = reactive<LoginUserRule>({
   account: [
     { required: true, message: "没有输入账号", trigger: "blur" },
     { required: true, message: "没有输入账号", trigger: "change" },
@@ -54,17 +57,17 @@ const rules = reactive<loginUserRule>({
   captcha: [
     { required: true, message: "请输入验证码", trigger: "blur" },
     { required: true, message: "请输入验证码", trigger: "change" },
-  ]
+  ],
 })
 
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  formEl.validate(async (valid) => {
+  formEl.validate(async valid => {
     if (valid) {
       const data = await login(user)
-      ElMessage({ message: data.message, type: data.action ? 'success' : 'error' })
+      ElMessage({ message: data.message, type: data.action ? "success" : "error" })
       if (data.action) {
-        router.push({ name: 'main' })
+        router.push({ name: "main" })
       } else {
         captcha.reset()
       }
@@ -72,7 +75,6 @@ const sumbit = (formEl: FormInstance | undefined) => {
   })
 }
 // ===============
-
 </script>
 
 <style scoped>
@@ -82,7 +84,7 @@ const sumbit = (formEl: FormInstance | undefined) => {
 }
 
 .no-radius :deep(.el-input__wrapper) {
-  border-radius: 0px
+  border-radius: 0px;
 }
 
 .el-button {

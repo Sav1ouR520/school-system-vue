@@ -7,18 +7,16 @@ export const TokenStore = defineStore("TokenStore", {
   state: (): Tokens => ({
     accessToken: "",
     refreshToken: "",
+    needRequest: false,
   }),
   actions: {
-    setTokens(tokens: Tokens) {
-      this.$state = tokens
-    },
     async refresh() {
       await refreshToken()
     },
   },
   getters: {
-    userId: (state) => {
-      if(state.accessToken){
+    userId: state => {
+      if (state.accessToken) {
         const accessToken: TokenPayload = jwt_decode(state.accessToken)
         return accessToken.id
       }
@@ -29,14 +27,19 @@ export const TokenStore = defineStore("TokenStore", {
       }
       return true
     },
-    outOfDate: (state): boolean => {
+    outOfAccessDate: (state): boolean => {
+      const nowTimeStamp = Math.floor(new Date().valueOf() / 1000)
+      if (state.accessToken !== "" || state.refreshToken !== "") {
+        const accessTokenTimeStamp: TokenPayload = jwt_decode(state.accessToken)
+        return nowTimeStamp > accessTokenTimeStamp.exp
+      }
+      return false
+    },
+    outOfrefreshDate: (state): boolean => {
       const nowTimeStamp = Math.floor(new Date().valueOf() / 1000)
       if (state.accessToken !== "" || state.refreshToken !== "") {
         const refreshTokenTimeStamp: TokenPayload = jwt_decode(state.refreshToken)
-        if (refreshTokenTimeStamp.exp > nowTimeStamp) {
-          const accessTokenTimeStamp: TokenPayload = jwt_decode(state.accessToken)
-          return nowTimeStamp > accessTokenTimeStamp.exp
-        }
+        return refreshTokenTimeStamp.exp < nowTimeStamp
       }
       return false
     },

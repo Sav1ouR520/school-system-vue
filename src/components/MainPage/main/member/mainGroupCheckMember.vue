@@ -37,9 +37,7 @@ const dialogVisible = ref<boolean>(false)
 const props = defineProps<{ dialog: boolean; memberId: string }>()
 watch(props, async () => {
   dialogVisible.value = props.dialog
-  if (props.memberId !== "" && props.dialog) {
-    member.value = (await getData()) as Member
-  }
+  if (props.memberId !== "" && props.dialog) getData()
 })
 const emit = defineEmits<{
   (e: "close-dialog", value: boolean): void
@@ -55,7 +53,7 @@ const close = () => {
 
 // === 数据获取 ===
 const page = GroupPage()
-const getData = async () => (await findMemberByMemberId(page.group.id, props.memberId))!.data
+const getData = () => findMemberByMemberId(page.group.id, props.memberId).then(data => (member.value = data.data as Member))
 const reset = () => ({ id: "", name: "", groupId: "", role: "" as "user", joinTime: "", icon: "", userId: "" })
 const member = ref<Member>(reset())
 // ===============

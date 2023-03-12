@@ -1,17 +1,17 @@
 <template>
-  <div  flex-col bg-gray-900 :class="[checkOtherPageWindow() ? 'hidden' : 'flex']" :style="optionWidth" v-show="switchAside.isActive">
+  <div  flex-col min-w-17.5 bg-gray-900 :class="[checkOtherPageWindow() ? 'hidden' : 'flex']" :style="optionWidth" v-show="switchAside.isActive">
     <div flex-grow>
       <optionIconItem item="group" icon="i-ic:baseline-groups" />
       <optionIconItem item="task" icon="i-carbon:task" />
     </div>
     <div>
       <optionIconItem item="user" icon="i-carbon:user-avatar-filled" />
-      <optionIconItem item="setting" icon="i-ic:baseline-settings" />
+      <!-- <optionIconItem item="setting" icon="i-ic:baseline-settings" /> -->
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { SwitchAside } from '@/stores/switch/SwitchAside.js';
+import { SwitchAside } from '@/stores/switch/SwitchAside';
 
 // === options的宽度控制 ===
 const switchAside = SwitchAside()

@@ -2,7 +2,7 @@
   <groupMainAddTask :dialog="dialogVisible" @close-dialog="close" @add-task="add" />
   <groupMainCard name="群任务" :num="tasks.length" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
     <template #icon>
-      <div flex items-center justify-between rounded-full cursor-pointer @click="changeCheck()" :class="checkActive ? 'text-blue' : ''">
+      <div flex items-center justify-between rounded-full cursor-pointer @click="changeCheck()" :class="checkActive ? 'text-blue' : ''" @dragstart.prevent>
         <i-ic:baseline-list-alt />
       </div>
     </template>
@@ -13,7 +13,7 @@
             <div flex flex-grow pl-2>
               {{ task.name }}
             </div>
-            <div flex justify-center pr-2>{{ task.file }}/{{ page.item.members }}</div>
+            <div flex justify-center pr-2>{{ task.file }}/{{ group.item.members }}</div>
           </div>
         </div>
       </el-scrollbar>
@@ -23,28 +23,32 @@
 
 <script setup lang="ts">
 import { deleteTask, getTaskByGroupId } from "@/api/task"
+import type { TaskMain } from "@/interface/task"
 import { GroupPage } from "@/stores/pages/GroupPage"
+import { TaskPage } from "@/stores/pages/TaskPage"
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 import { useRouter } from "vue-router"
 
 // === 初始化数据 ===
 const router = useRouter()
-const page = GroupPage()
-const getTask = async () => (await getTaskByGroupId(page.group.id)).data
-const data = await getTask()
-const tasks = ref(data ? data : [])
-page.item.tasks = tasks.value.length
+const group = GroupPage()
+const getTask = () =>
+  getTaskByGroupId(group.group.id).then(data => {
+    tasks.value = data.data as TaskMain[]
+    group.item.tasks = tasks.value.length ? tasks.value.length : 0
+  })
+const tasks = ref<TaskMain[]>([])
+getTask()
 // ================
 
 // === 数据更改监听 ===
 const timer = ref(0)
-page.$subscribe(
+group.$subscribe(
   async (mutation, state) => {
     const updateTime = state.update.time
     if (state.update.type === "task" && updateTime > timer.value) {
       timer.value = updateTime
-      const data = await getTask()
-      tasks.value = data ? data : tasks.value
+      getTask()
     }
   },
   { detached: true, deep: true },
@@ -60,10 +64,7 @@ const addFn = () => {
 const close = (value: boolean) => {
   switchAside.hasDiglog = dialogVisible.value = value
 }
-const add = async () => {
-  const data = await getTask()
-  tasks.value = data ? data : []
-}
+const add = () => getTask()
 // ================
 
 // === 查看任务情况 ===
@@ -105,14 +106,14 @@ const choose = (id: string) => {
     }
   } else {
     router.push(`/main/group/task`)
-    page.click.id = id
-    page.click.type = "task"
+    group.click.id = id
+    group.click.type = "task"
     if (modifyAcitve.value) {
-      page.click.status = "modify"
+      group.click.status = "modify"
     } else if (checkActive.value) {
-      page.click.status = "check"
+      group.click.status = "check"
     } else {
-      page.click.status = "add"
+      group.click.status = "add"
     }
   }
 }
@@ -123,14 +124,16 @@ const sumbit = async () => {
   if (chooseList.value.length !== 0) {
     const list = chooseList.value
     await deleteTask(chooseList.value)
-    if (list.includes(page.click.id)) {
+    if (list.includes(group.click.id)) {
       router.push(`/main/group`)
-      page.click.id = ""
-      page.click.type = null
+      group.click.id = ""
+      group.click.type = null
     }
-    const data = await getTask()
-    tasks.value = data ? data : []
+    getTask()
     ElNotification({ message: `成功删除任务`, type: "success" })
+    const task = TaskPage()
+    group.update.type = "group"
+    group.update.time = task.time = new Date().valueOf()
   }
 }
 // ===================

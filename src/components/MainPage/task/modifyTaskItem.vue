@@ -4,18 +4,18 @@
       <div flex items-center flex-grow font-bold text-lg h-8>群任务</div>
       <div flex items-center text-xs px-1 ml-2 h-8 border-2 bg-black rounded text-white>
         <span>创建者:</span>
-        <span font-bold>{{ data!.task.member.name }}</span>
+        <span font-bold>{{ data!.member.name }}</span>
       </div>
       <div flex items-center text-xs px-1 ml-2 h-8 border-2 bg-black rounded text-white>
         <span>时间:</span>
-        <span font-bold>{{ moment(data!.task.createTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
+        <span font-bold>{{ moment(data!.createTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
       </div>
     </div>
     <hr border-b-2 m-2 mb-4 />
     <el-form mx-2 hide-required-asterisk status-icon :rules="rules" :model="formTask" ref="ruleFormRef" @submit.prevent>
       <div flex items-center justify-center text-xs mb-4 h-8 border-2 bg-gray rounded text-white>
         <span mr-1>标识:</span>
-        <span font-bold>[{{ data!.task.id }}]</span>
+        <span font-bold>[{{ data!.id }}]</span>
       </div>
       <el-form-item label="任务名称" prop="name">
         <el-input v-model="formTask.name" />
@@ -28,7 +28,7 @@
           <el-radio-button :label="true">开启</el-radio-button>
           <el-radio-button :label="false" @click="cancelFile()">关闭</el-radio-button>
         </el-radio-group>
-        <div v-if="data!.task.dataPath">
+        <div v-if="data!.dataPath">
           <el-button @click="downloadFile()" type="primary" plain>下载</el-button>
           <el-button @click="deleteFile()" type="danger" plain>删除</el-button>
         </div>
@@ -51,31 +51,76 @@
 </template>
 
 <script setup lang="ts">
-import { findTaskByTaskId, modifyTask, deleteTaskFile } from "@/api/task"
+import { findtaskInfoByTaskId, modifyTask, deleteTaskFile } from "@/api/task"
 import type { FormInstance, FormItemRule, UploadFiles, UploadInstance, UploadProps } from "element-plus"
 import moment from "moment"
 
-import type { ModifyTask } from "@/interface/task"
+import type { ModifyTask, Task } from "@/interface/task"
 import { FileZip } from "@/utils/filezip"
+import { TaskPage } from "@/stores/pages/TaskPage"
 import { GroupPage } from "@/stores/pages/GroupPage"
 
 // === 查找task信息 ===
-const page = GroupPage()
-const refreshData = async () => (await findTaskByTaskId(page.click.id)).data
-const data = ref(await refreshData())
+const task = TaskPage()
+const group = GroupPage()
+const getData = () => {
+  let request = null
+  if (routerName === "task") {
+    request = findtaskInfoByTaskId(task.id).then(items => (data.value = items.data as Task))
+  } else {
+    request = findtaskInfoByTaskId(group.click.id).then(items => (data.value = items.data as Task))
+  }
+  request.then(() => {
+    formTask.id = data.value!.id
+    formTask.name = data.value!.name
+    formTask.introduce = data.value!.introduce
+    formTask.file = new Blob()
+  })
+}
+
+// === 获取router信息 ===
+const router = useRouter()
+const routerName = router.currentRoute.value.name
+const clickid = ref()
+if (routerName === "task") {
+  clickid.value = task.id
+} else if (routerName === "groupTask") {
+  clickid.value = group.click.id
+}
+// =====================
+const data = ref<Task>({
+  id: "",
+  name: "",
+  introduce: "",
+  memberId: "",
+  groupId: "",
+  activeStatue: true,
+  dataPath: null,
+  createTime: new Date(),
+  member: { id: "", name: "", groupId: "", userId: "", role: "admin", joinTime: new Date(), icon: "" },
+})
 // ===================
 
 // === 监听数据变化 ===
-const clickid = ref(page.click.id)
-page.$subscribe(
+task.$subscribe(
   async (mutation, state) => {
-    if (state.click.type === "task" && state.click.status === "modify" && clickid.value !== state.click.id) {
-      clickid.value = page.click.id
-      await getData()
+    if (state.type === "modify" && clickid.value !== state.id) {
+      clickid.value = task.id
+      getData()
     }
   },
   { detached: true, deep: true },
 )
+group.$subscribe(
+  async (mutation, state) => {
+    if (state.click.type === "task" && state.click.status === "modify" && clickid.value !== state.click.id) {
+      clickid.value = group.click.id
+      getData()
+    }
+  },
+  { detached: true, deep: true },
+)
+
 // ===============
 
 // === 文件上传/下载功能 ===
@@ -95,27 +140,18 @@ const cancelFile = () => {
   upload.value!.clearFiles()
 }
 const downloadFile = () => {
-  window.location.href = "/data/task/" + data.value!.task.dataPath
+  window.location.href = "/data/task/" + data.value!.dataPath
 }
 // ====================
 
 // === 表单验证 ===
-const getData = async () => {
-  const newData = await refreshData()
-  data.value = newData
-  const { id, name, introduce } = data.value!.task
-  formTask.id = id
-  formTask.name = name
-  formTask.introduce = introduce
-  formTask.file = new Blob()
-}
 const formTask = reactive<ModifyTask>({
   id: "",
   name: "",
   introduce: "",
   file: new Blob(),
 })
-await getData()
+getData()
 const ruleFormRef = ref<FormInstance>()
 type FormTaskRule = {
   [k in keyof ModifyTask]?: Array<FormItemRule>
@@ -142,9 +178,12 @@ const cancel = (formEl: FormInstance | undefined) => {
 const sumbitAction = async (formEl: FormInstance) => {
   await modifyTask(formTask, hasData.value && fileList.value.length !== 0)
   cancel(formEl)
-  data.value = await refreshData()
-  page.update = { time: new Date().valueOf(), type: "task" }
+  getData()
   ElNotification({ message: `成功修改任务${formTask.name}`, type: "success" })
+  if (routerName === "groupTask") {
+    group.update = { time: new Date().valueOf(), type: "task" }
+  }
+  task.time = new Date().valueOf()
 }
 
 const sumbit = (formEl: FormInstance | undefined) => {
@@ -168,9 +207,9 @@ const sumbit = (formEl: FormInstance | undefined) => {
 }
 
 const deleteFile = async () => {
-  await deleteTaskFile(data.value!.task.id)
+  await deleteTaskFile(data.value!.id)
+  getData()
   ElNotification({ message: `成功移除${formTask.name}的文件`, type: "success" })
-  await getData()
 }
 // ===============
 </script>

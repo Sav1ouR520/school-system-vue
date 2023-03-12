@@ -56,32 +56,81 @@
 
 <script setup lang="ts">
 import { modifyFile, uploadFile } from "@/api/file"
-import { findTaskByTaskId } from "@/api/task"
+import { findtaskWithFileByTaskId } from "@/api/task"
+import type { TaskWithFile } from "@/interface/task"
 import { GroupPage } from "@/stores/pages/GroupPage"
+import { TaskPage } from "@/stores/pages/TaskPage"
 import { FileZip } from "@/utils/filezip"
 import type { FormInstance, FormItemRule, UploadFiles, UploadInstance, UploadProps } from "element-plus"
 import moment from "moment"
 
 // === 获取数据 ===
-const page = GroupPage()
-const refreshData = async () => (await findTaskByTaskId(page.click.id)).data
-const data = ref(await refreshData())
+const task = TaskPage()
+const group = GroupPage()
+const refreshData = () => {
+  let request = null
+  if (routerName === "task") {
+    request = findtaskWithFileByTaskId(task.id)
+  } else {
+    request = findtaskWithFileByTaskId(group.click.id)
+  }
+  request.then(items => {
+    data.value = items.data as TaskWithFile
+    if (items.data?.File) {
+      uploadFrom.id = items.data.File.id
+    }
+    uploadFrom.taskId = items.data!.task.id
+  })
+}
+// ================
 
+// === 获取router信息 ===
+const router = useRouter()
+const routerName = router.currentRoute.value.name
+const clickid = ref()
+if (routerName === "task") {
+  clickid.value = task.id
+} else if (routerName === "groupTask") {
+  clickid.value = group.click.id
+}
+// =====================
+const data = ref<TaskWithFile>({
+  task: {
+    id: "",
+    name: "",
+    introduce: "",
+    memberId: "",
+    groupId: "",
+    activeStatue: true,
+    dataPath: null,
+    createTime: new Date(),
+    member: { id: "", name: "", groupId: "", userId: "", role: "admin", joinTime: new Date(), icon: "" },
+  },
+  File: null,
+})
 const downloadPreFile = () => {
   window.location.href = "/data/task/" + data.value!.task.dataPath
 }
 const downloadUploadFile = () => {
-  window.location.href = "/data/file/" + data.value!.File.filePath
+  if (data.value.File) window.location.href = "/data/file/" + data.value!.File.filePath
 }
 // ===============
 
 // === 监听数据变化 ===
-const clickid = ref(page.click.id)
-page.$subscribe(
+task.$subscribe(
+  async (mutation, state) => {
+    if (state.type === "upload" && clickid.value !== state.id) {
+      clickid.value = task.id
+      refreshData()
+    }
+  },
+  { detached: true, deep: true },
+)
+group.$subscribe(
   async (mutation, state) => {
     if (state.click.type === "task" && state.click.status === "add" && clickid.value !== state.click.id) {
-      clickid.value = page.click.id
-      data.value = await refreshData()
+      clickid.value = group.click.id
+      refreshData()
     }
   },
   { detached: true, deep: true },
@@ -91,7 +140,6 @@ page.$subscribe(
 // === 文件上传 ===
 const upload = ref<UploadInstance>()
 const fileList = ref<UploadFiles>([])
-
 const handleChange: UploadProps["onChange"] = (uploadFile, uploadFiles) => {
   fileList.value = uploadFiles
   formFile.hasFile = true
@@ -104,7 +152,6 @@ const handleRemove: UploadProps["onRemove"] = (uploadFile, uploadFiles) => {
   }
   ruleFormRef.value?.validateField("hasFile")
 }
-
 const cancelFile = () => {
   upload.value!.clearFiles()
   formFile.hasFile = false
@@ -114,8 +161,8 @@ const cancelFile = () => {
 
 // === 表单认证 ===
 const uploadFrom = reactive({
-  id: data.value!.File ? data.value!.File.id : "",
-  taskId: data.value!.task.id,
+  id: "",
+  taskId: "",
   file: new Blob(),
 })
 const formFile = reactive({ hasFile: false })
@@ -134,7 +181,6 @@ const rules = reactive<{ hasFile: Array<FormItemRule> }>({
     },
   ],
 })
-
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate(async valid => {
@@ -149,13 +195,17 @@ const sumbit = (formEl: FormInstance | undefined) => {
       } else {
         await uploadFile({ taskId: uploadFrom.taskId, file: uploadFrom.file })
       }
-      data.value = await refreshData()
-      page.update = { time: new Date(data.value!.File.uploadTime).valueOf(), type: "task" }
+      refreshData()
       ElNotification({ message: `成功提交文件`, type: "success" })
+      if (routerName === "groupTask") {
+        group.update = { time: new Date().valueOf(), type: "task" }
+      }
+      task.time = new Date().valueOf()
       cancelFile()
     }
   })
 }
+refreshData()
 // ==============
 </script>
 

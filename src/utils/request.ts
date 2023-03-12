@@ -20,7 +20,7 @@ declare module "axios" {
 }
 
 request.interceptors.request.use(
-  config => {
+  async config => {
     if (config?.headers) {
       const tokenStore = TokenStore()
       if (tokenStore.verification) {
@@ -37,19 +37,18 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
   response => {
-    console.log(router.currentRoute.value.path)
     return response
   },
   async error => {
     if (error.response.status === 401) {
-      const path = router.currentRoute.value.path
       const tokenStore = TokenStore()
-      if (tokenStore.outOfDate) {
-        await tokenStore.refresh()
-        router.push(path)
-      } else {
+      tokenStore.refresh()
+      if (tokenStore.outOfrefreshDate) {
         tokenStore.$reset()
       }
+    } else if (error.response.status === 403) {
+      const tokenStore = TokenStore()
+      tokenStore.$reset()
     }
     return Promise.reject(error.response)
   },
@@ -57,7 +56,7 @@ request.interceptors.response.use(
 
 export type ResponseData<T = any> = {
   statusCode: number
-  data?: T
+  data: T
   action: boolean
   message: string
   timestamp: Date

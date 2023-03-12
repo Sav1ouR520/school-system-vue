@@ -13,6 +13,46 @@ export type Task = {
   member: Member
 }
 
+export type AsideTaskWithDegree = {
+  group: {
+    id: string
+    name: string
+    icon: string
+    member: number
+  }
+  task: {
+    id: string
+    name: string
+    createTime: Date
+    file: number
+  }
+}
+
+export type AsideTask = {
+  group: {
+    id: string
+    name: string
+    icon: string
+  }
+  task: {
+    id: string
+    name: string
+    createTime: Date
+    file: boolean
+  }
+}
+
+export type TaskWithMember = {
+  id: string
+  name: string
+  introduce: string
+  memberId: string
+  groupId: string
+  activeStatue: boolean
+  dataPath: string | null
+  createTime: Date
+  member: Member
+}
 
 export type FormTask = {
   name: string
@@ -28,9 +68,9 @@ export type ModifyTask = {
   file: Blob
 }
 
-export type TaskWithFile2 = {
-  task: Task
-  File: File
+export type TaskWithFile = {
+  task: TaskWithMember
+  File: File | null
 }
 
 export type TaskMain = {

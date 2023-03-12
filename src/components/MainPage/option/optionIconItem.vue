@@ -7,16 +7,21 @@
 </template>
 
 <script setup lang="ts">
-import { SwitchAside } from "@/stores/switch/SwitchAside.js"
-
+import { SwitchAside } from "@/stores/switch/SwitchAside"
+const router = useRouter()
 // === 当选中指定图标，切换改图标颜色为绿色 同时修改其他为白色 ===
 const switchAside = SwitchAside()
-const props = withDefaults(defineProps<{
-  item: string,
-  icon: string
-}>(), {})
-const change = () => switchAside.item = props.item
-const color = () => (switchAside.item === props.item ? 'text-green' : 'text-white')
+const props = defineProps<{ item: string; icon: string }>()
+const change = () => {
+  switchAside.item = props.item
+  if (switchAside.item === "user") {
+    router.push('/main/user')
+  }
+  // else if (router.currentRoute.value.name === 'user' && switchAside.item !== "user") {
+  //   router.push('/main')
+  // }
+}
+const color = () => (switchAside.item === props.item ? "text-green" : "text-white")
 // ==========================================================
 </script>
 

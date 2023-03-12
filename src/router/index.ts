@@ -1,4 +1,5 @@
 import { GroupPage } from "@/stores/pages/GroupPage"
+import { TaskPage } from "@/stores/pages/TaskPage"
 import { TokenStore } from "@/stores/TokenStore"
 import { createRouter, createWebHistory } from "vue-router"
 
@@ -55,7 +56,7 @@ const router = createRouter({
             {
               path: "/main/group/task",
               name: "groupTask",
-              component: () => import("@/views/group/GroupMainTaskView.vue"),
+              component: () => import("@/views/GroupMainTaskView.vue"),
               meta: {
                 title: "group",
               },
@@ -71,7 +72,7 @@ const router = createRouter({
           ],
         },
         {
-          path: "user",
+          path: "/main/user",
           name: "user",
           component: () => import("@/views/UserViews.vue"),
           meta: {
@@ -82,6 +83,21 @@ const router = createRouter({
             const page = GroupPage()
             if (!tokenStore.verification) next({ name: "login" })
             if (page.group.id === "") next({ name: "main" })
+            else next()
+          },
+        },
+        {
+          path: "/main/task",
+          name: "task",
+          component: () => import("@/views/TaskViews.vue"),
+          meta: {
+            title: "task",
+          },
+          beforeEnter: (to, from, next) => {
+            const tokenStore = TokenStore()
+            const page = TaskPage()
+            if (!tokenStore.verification) next({ name: "login" })
+            if (page.id === "") next({ name: "main" })
             else next()
           },
         },

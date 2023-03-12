@@ -1,11 +1,11 @@
 <template>
   <el-dialog v-model="dialogVisible" width="25rem" :before-close="send" draggable align-center>
     <template #header="{ titleId }">
-      <div flex items-center >
+      <div flex items-center>
         <el-avatar mr-1 :size="30" :src="formMember.icon">
           <i-ic:baseline-image text-sm />
         </el-avatar>
-        <div :id="titleId" >修改成员信息</div>
+        <div :id="titleId">修改成员信息</div>
       </div>
     </template>
     <el-form hide-required-asterisk status-icon :rules="rules" :model="formMember" size="large" ref="ruleFormRef" @submit.prevent>
@@ -39,10 +39,7 @@ const props = defineProps<{ dialog: boolean; memberId: string }>()
 watch(props, async () => {
   dialogVisible.value = props.dialog
   if (props.memberId !== "" && props.dialog) {
-    const data = await getData()
-    formMember.value = data as Member
-    backup.role = data!.role
-    backup.name = data!.name
+    getData()
   }
 })
 const emit = defineEmits<{
@@ -63,7 +60,12 @@ const close = () => {
 const page = GroupPage()
 const user = TokenStore()
 const backup = reactive({ role: "", name: "" })
-const getData = async () => (await findMemberByMemberId(page.group.id, props.memberId))!.data
+const getData = () =>
+  findMemberByMemberId(page.group.id, props.memberId).then(data => {
+    formMember.value = data.data as Member
+    backup.role = data.data!.role
+    backup.name = data.data!.name
+  })
 const reset = () => ({ id: "", name: "", groupId: "", role: "" as "user", joinTime: "", icon: "", userId: "" })
 const formMember = ref<Member>(reset())
 const ruleFormRef = ref<FormInstance>()

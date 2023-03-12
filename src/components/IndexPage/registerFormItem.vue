@@ -1,14 +1,14 @@
 <template>
   <el-form @submit.prevent :rules="rules" status-icon ref="ruleFormRef" :model="user" size="large" label-position="top">
     <el-form-item label="密码" prop="username">
-      <el-input v-model="user.username" placeholder="请输入用户名" maxlength="20">
+      <el-input v-model="user.username" placeholder="请输入用户名">
         <template #prefix>
           <i-ep-user></i-ep-user>
         </template>
       </el-input>
     </el-form-item>
     <el-form-item label="邮箱" prop="account" :error="captcha.emailErrorMeg">
-      <el-input v-model="user.account" placeholder="使用邮箱注册" maxlength="20">
+      <el-input v-model="user.account" placeholder="使用邮箱注册">
         <template #prefix>
           <i-ep-message></i-ep-message>
         </template>
@@ -18,7 +18,7 @@
       </el-input>
     </el-form-item>
     <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg" flex-grow>
-      <el-input class="no-radius" v-model.number="user.captcha" placeholder="请输入验证码" maxlength="4"
+      <el-input class="no-radius" v-model="user.captcha" placeholder="请输入验证码" maxlength="4"
         ><template #prefix>
           <i-ep-message></i-ep-message>
         </template>
@@ -46,11 +46,11 @@
 
 <script setup lang="ts">
 import { checkAccountAvailable, register } from "@/api/user"
-import type { registerUser, registerUserRule } from "@/interface/user"
-import type { FormInstance } from "element-plus"
+import type { RegisterUser } from "@/interface/user"
+import type { FormInstance, FormItemRule } from "element-plus"
 import { sendCode } from "@/api/email"
-import { SwitchForm } from "@/stores/switch/SwitchForm.js"
-import { Captcha } from "@/stores/Captcha.js"
+import { SwitchForm } from "@/stores/switch/SwitchForm"
+import { Captcha } from "@/stores/Captcha"
 
 // === 表单验证 ===
 const captcha = Captcha()
@@ -63,7 +63,7 @@ const initialState = () => ({
   repassword: "",
   captcha: "",
 })
-const user = reactive<registerUser>(initialState())
+const user = reactive<RegisterUser>(initialState())
 const accountInfo = { account: "", message: "" }
 captcha.countDown()
 const send = async () => {
@@ -121,10 +121,23 @@ const checkRePassword = (value: any, callback: any) => {
     callback()
   }
 }
-const rules = reactive<registerUserRule>({
+const checkUsername = (value: string, callback: any) => {
+  if (value.length < 6) {
+    callback(new Error("用户名长度至少需要6位"))
+  } else if (value.length > 20) {
+    callback(new Error("用户名长度不能超过20位"))
+  } else {
+    callback()
+  }
+}
+
+type RegisterUserRule = {
+  [k in keyof RegisterUser]?: Array<FormItemRule>
+}
+const rules = reactive<RegisterUserRule>({
   username: [
-    { required: true, message: "请输入用户名", trigger: "blur" },
-    { required: true, message: "请输入用户名", trigger: "change" },
+    { required: true, trigger: "blur", validator: (_, value, callback) => checkUsername(value, callback) },
+    { required: true, trigger: "change", validator: (_, value, callback) => checkUsername(value, callback) },
   ],
   account: [
     { required: true, message: "请输入邮箱", trigger: "blur" },

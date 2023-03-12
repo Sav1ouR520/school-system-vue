@@ -1,5 +1,5 @@
 <template>
-  <div flex-col bg-white :style="checkMainPageWindow() ? '' : asiderWidth" :class="[checkMainPageWindow() ? 'flex-grow' : '', checkOtherPageWindow() ? 'hidden' : 'flex']" ref="aside">
+  <div flex-col bg-white min-w-70 :style="checkMainPageWindow() ? '' : asiderWidth" :class="[checkMainPageWindow() ? 'flex-grow' : '', checkOtherPageWindow() ? 'hidden' : 'flex']" ref="aside">
     <keep-alive>
       <asideGroupItem v-if="switchAside.item === 'group'"></asideGroupItem>
       <asideTaskItem v-else-if="switchAside.item === 'task'"></asideTaskItem>

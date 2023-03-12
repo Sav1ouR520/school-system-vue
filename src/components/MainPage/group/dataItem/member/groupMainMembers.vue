@@ -8,7 +8,7 @@
         <div items-center border border-transparent hover:border-current cursor-pointer :class="[deleteActive ? 'hover:bg-red-100' : '', modifyAcitve ? 'hover:bg-blue-100' : '', chooseList.includes(`${member.id}`) ? 'text-red' : 'text-black']" v-for="member in members" :key="member.id" @click="choose(`${member.id}`)">
           <div flex h-10 flex-grow px-2 justify-between items-center w-full>
             <div flex items-center>
-              <el-avatar :size="30" :src="member.icon">
+              <el-avatar :size="30" :src="member.icon ? '/data/user/' + member.icon : null" @dragstart.prevent>
                 <i-ic:baseline-image text-sm />
               </el-avatar>
               <span ml-2>{{ member.name }}</span>
@@ -28,14 +28,19 @@
 
 <script setup lang="ts">
 import { deleteMember, findMemberByGroupId } from "@/api/member"
+import type { GroupMember } from "@/interface/member"
 import { GroupPage } from "@/stores/pages/GroupPage"
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 
 const page = GroupPage()
-const getMember = async () => (await findMemberByGroupId(page.group.id))!.data
-const data = await getMember()
-const members = ref(data ? data : [])
-page.item.members = members.value.length
+const getMember = () => {
+  findMemberByGroupId(page.group.id).then(data => {
+    members.value = data!.data as GroupMember[]
+    page.item.members = members.value.length
+  })
+}
+const members = ref<GroupMember[]>([])
+getMember()
 
 // === 打开添加的diglog ===
 const switchAside = SwitchAside()
@@ -50,10 +55,7 @@ const addClose = (value: boolean) => {
 
 // === 更新数据
 const refresh = async (value: boolean) => {
-  if (value) {
-    const data = await getMember()
-    members.value = data ? data : []
-  }
+  if (value) getMember()
 }
 // ================
 
@@ -64,8 +66,7 @@ page.$subscribe(
     const updateTime = state.update.time
     if (state.update.type === "member" && updateTime > timer.value) {
       timer.value = updateTime
-      const data = await getMember()
-      members.value = data ? data : []
+      getMember()
     }
   },
   { detached: true, deep: true },
@@ -136,8 +137,7 @@ const choose = (id: string) => {
 const sumbit = async () => {
   if (chooseList.value.length !== 0) {
     await deleteMember(chooseList.value)
-    const data = await getMember()
-    members.value = data ? data : []
+    getMember()
     ElNotification({ message: `成功删除成员`, type: "success" })
   }
 }

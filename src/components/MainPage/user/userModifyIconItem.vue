@@ -1,20 +1,10 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="修改组" width="30rem" :before-close="send" draggable align-center>
-    <el-form hide-required-asterisk status-icon :rules="rules" :model="formGroup" size="large" ref="ruleFormRef" @submit.prevent>
-      <div flex>
-        <el-form-item label="组名" prop="name">
-          <el-input v-model="formGroup.name" maxlength="20"></el-input>
-        </el-form-item>
-        <el-form-item label="组长" ml-4>
-          <el-select v-model="formGroup.owner" w-full placeholder="[组长转交可选项]">
-            <el-option v-for="member in members" :key="member.id" :label="member.name" :value="member.userId" />
-          </el-select>
-        </el-form-item>
-      </div>
-      <el-form-item label="头像">
+  <el-dialog v-model="dialogVisible" title="修改头像" width="30rem" :before-close="send" draggable align-center>
+    <el-form hide-required-asterisk status-icon :rules="rules" :model="formUser" size="large" ref="ruleFormRef" @submit.prevent>
+      <el-form-item label="头像" prop="icon">
         <div flex w-full items-center>
           <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow>
-            <p text-blue>拖拽文件或点击上传['可选']</p>
+            <p text-blue>拖拽文件或点击上传</p>
           </el-upload>
           <div ml-2 flex items-center v-show="option.img !== ''">
             <el-button type="primary" @click="cancelImage">取消图片</el-button>
@@ -26,55 +16,31 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <div flex justify-between>
-        <div>
-          <el-button type="danger" @click="remove()">删除组</el-button>
-        </div>
-        <div>
-          <el-button @click="cancel(ruleFormRef)">取消修改</el-button>
-          <el-button type="primary" @click="sumbit(ruleFormRef)">确认修改</el-button>
-        </div>
-      </div>
+      <el-button @click="cancel(ruleFormRef)">取消</el-button>
+      <el-button type="primary" @click="sumbit(ruleFormRef)">修改</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { deleteGroup, modifyGroup } from "@/api/group"
-import { findMemberByGroupId } from "@/api/member"
-import type { GroupMember } from "@/interface/member"
-import { GroupPage } from "@/stores/pages/GroupPage"
-import { TaskPage } from "@/stores/pages/TaskPage"
-import { genFileId, type FormInstance, type FormItemRule, type UploadProps, type UploadRawFile, type UploadInstance } from "element-plus"
+import { getUserInfo, updateUserIcon } from "@/api/user"
+import { UserPage } from "@/stores/pages/UserPage"
+import { genFileId, type FormInstance, type UploadProps, type UploadRawFile, type UploadInstance, type FormItemRule } from "element-plus"
 
+const user = UserPage()
 // === 开关diglog 使用Props和Emits作为父子组件通信[可以pinia] ===
 const dialogVisible = ref<boolean>(false)
 const props = defineProps<{ dialog: boolean }>()
 watch(props, async () => {
   dialogVisible.value = props.dialog
-  if (props.dialog) {
-    page.getGroup()
-    getMember()
-    formGroup.value = { name: page.group.name, id: page.group.id, owner: page.group.owner }
-  }
 })
 const emit = defineEmits<{
   (e: "close-dialog", value: boolean): void
-  (e: "add-group", value: number): void
 }>()
 const send = () => {
   emit("close-dialog", false)
 }
 // ===========================================================
-
-// === 获取数据 ===
-const router = useRouter()
-const page = GroupPage()
-const members = ref<GroupMember[]>([])
-const getMember = () => {
-  findMemberByGroupId(page.group.id).then(data => (members.value = data.data as GroupMember[]))
-}
-// ===============
 
 // === 上传文件功能 ===
 const upload = ref<UploadInstance>()
@@ -92,6 +58,8 @@ const handleChange: UploadProps["onChange"] = uploadFile => {
     reader.onload = e => {
       option.img = e.target?.result as string
     }
+    formUser.icon = true
+    ruleFormRef.value?.clearValidate()
   }
 }
 // ===================
@@ -117,54 +85,46 @@ const option = reactive({
 const cancelImage = () => {
   option.img = ""
   upload.value!.clearFiles()
+  formUser.icon = false
 }
 // ===================
 
 // === 表单认证 ====
-const reset = () => ({ id: "", name: "", owner: "" })
-const formGroup = ref(reset())
 const ruleFormRef = ref<FormInstance>()
-const rules = reactive<{ name: Array<FormItemRule> }>({
-  name: [
-    { required: true, message: "组名不能为空", trigger: "blur" },
-    { required: true, message: "组名不能为空", trigger: "change" },
+const formUser = reactive({ icon: false })
+const rules = reactive<{ icon: Array<FormItemRule> }>({
+  icon: [
+    {
+      required: true,
+      trigger: "blur",
+      validator: (_, value, callback) => (value ? callback() : callback(new Error("未上传图片"))),
+    },
+    {
+      required: true,
+      trigger: "change",
+      validator: (_, value, callback) => (value ? callback() : callback(new Error("未上传图片"))),
+    },
   ],
 })
-const remove = async () => {
-  await deleteGroup(page.group.id)
-  page.$reset()
-  router.push(`/main`)
-  ElNotification({ message: `成功删除组${formGroup.value.name}`, type: "success" })
-}
 const cancel = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   cancelImage()
   formEl.resetFields()
   send()
 }
-const sumbitAction = async (formEl: FormInstance, icon?: File) => {
-  await modifyGroup({ ...formGroup.value, icon })
-  cancel(formEl)
-  emit("add-group", new Date().valueOf())
-  page.getGroup()
-  formGroup.value = reset()
-  page.update = { time: new Date().valueOf(), type: "group" }
-  ElNotification({ message: `成功修改组${formGroup.value.name}`, type: "success" })
-  const task = TaskPage()
-  task.time = new Date().valueOf()
-}
-const sumbit = (formEl: FormInstance | undefined) => {
+const sumbit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate(async valid => {
     if (valid) {
-      if (option.img !== "") {
-        await cropper.value.getCropBlob((data: Blob) => {
-          const file = new File([data], "clipImage" + data.type.split("/")[1], { type: data.type })
-          sumbitAction(formEl, file)
+      await cropper.value.getCropBlob(async (data: Blob) => {
+        const file = new File([data], "clipImage" + data.type.split("/")[1], { type: data.type })
+        await updateUserIcon(file)
+        cancel(formEl)
+        getUserInfo().then(data => {
+          user.$state = data.data
         })
-      } else {
-        sumbitAction(formEl)
-      }
+        ElNotification({ message: `成功修改用户头像${user.username}`, type: "success" })
+      })
     }
   })
 }
@@ -175,5 +135,11 @@ const sumbit = (formEl: FormInstance | undefined) => {
 :deep(.el-upload-dragger) {
   padding: 0px;
   height: 40px;
+}
+
+:deep(.el-input-group__append) {
+  height: 40px;
+  width: 100px;
+  padding: 0;
 }
 </style>

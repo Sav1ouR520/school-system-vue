@@ -1,17 +1,20 @@
 <template>
-  <div v-for="member in members" :key="member.groupId">
-    <div flex w-full h-17.5 p-2.5 bg-gray-50 hover:bg-gray-100 @click="jump(member.groupId)">
-      <div w-12.5  flex items-center justify-center>
-        <el-avatar :size="50" :src="iconUrl(member.group)">
+  <div v-for="group in groups" :key="group.id">
+    <div flex w-full h-17.5 p-2.5 bg-gray-50 hover:bg-gray-100 @click="jump(group.id)">
+      <div w-12.5 flex items-center justify-center>
+        <el-avatar :size="50" :src="group.icon ? '/data/group/' + group.icon : ''" @dragstart.prevent>
           <i-ic:baseline-image text-3xl />
         </el-avatar>
       </div>
-      <div flex-grow px-2>
-        <div class="h-1/2" flex items-center>
-          <div flex-grow>{{ member.group.name }}</div>
-          <!-- <div>人数: {{ group.item.members }}</div> -->
+      <div flex-grow pl-2 text-gray-500 text-2>
+        <div class="h-1/2" flex items-center font-bold>
+          <span flex-grow text-4 text-gray-700>{{ group.name }}</span>
+          <span> {{ moment(group.createTime).format("YYYY-MM-DD") }}</span>
         </div>
-        <div class="h-1/2" flex items-center></div>
+        <div class="h-1/2" flex items-center font-bold>
+          <span flex-grow>人数: {{ group.member }}</span>
+          <span>任务总量: {{ group.task }} </span>
+        </div>
       </div>
     </div>
   </div>
@@ -19,44 +22,36 @@
 
 <script setup lang="ts">
 import { findGroupByUserId } from "@/api/group"
-import type { Group } from "@/interface/group"
 import { GroupPage } from "@/stores/pages/GroupPage"
 import { useRouter } from "vue-router"
-import { PageInfo } from "@/stores/pages/PageInfo"
+import moment from "moment"
+import type { AsideGroup } from "@/interface/group"
 
 // === 获取数据 ===
-const getMembers = async () => (await findGroupByUserId()).data
-const members = ref(await getMembers())
+const groups = ref<AsideGroup[]>()
+findGroupByUserId().then(data => (groups.value = data.data))
 // ===============
 
 // === 路由跳转 ===
 const router = useRouter()
 const group = GroupPage()
-const page = PageInfo()
 const jump = (groupId: string) => {
   router.push(`/main/group`)
   group.group.id = groupId
-  page.setPageInfo({ type: "group", id: groupId })
 }
 // ===============
 
 // === 数据更改监听 ===
 const timer = ref(0)
 group.$subscribe(
-  async (mutation, state) => {
+  (mutation, state) => {
     const updateTime = state.update.time
-    if ((state.update.type === "group" && updateTime > timer.value) || state.group.id === "") {
+    if (state.update.type === "group" && updateTime > timer.value) {
       timer.value = updateTime
-      members.value = await getMembers()
+      findGroupByUserId().then(data => (groups.value = data.data))
     }
   },
   { detached: true, deep: true },
 )
-// ===================
-
-// === 信息展示组件 ===
-const iconUrl = (group: Group) => {
-  return "/data/group/" + group.icon
-}
 // ===================
 </script>

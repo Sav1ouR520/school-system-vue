@@ -1,28 +1,36 @@
 import api from "@/utils/request"
-import type { TaskMain, FormTask, Task, TaskWithFile2, ModifyTask } from "@/interface/task"
+import type { Task, AsideTask, TaskMain, FormTask, TaskWithFile, ModifyTask, AsideTaskWithDegree } from "@/interface/task"
 
-export const findtaskInfoByTaskId  = async (taskId: string) => {
-  return await api<Task>({ url: `/task/${taskId}`, method: "get" })
+export const findTasksByUserId =  () => {
+  return api<AsideTask[]>({ url: `/task/userId`, method: "get" })
 }
 
-export const findTaskByTaskId = async (taskId: string) => {
-  return await api<TaskWithFile2>({ url: `/task/taskId/${taskId}`, method: "get" })
+export const findTaskByOwner =  () => {
+  return  api<AsideTaskWithDegree[]>({ url: `/task/owner`, method: "get" })
 }
 
-export const getTaskByGroupId = async (groupId: string) => {
-  return await api<TaskMain[]>({ url: `/task/groupId/${groupId}`, method: "get" })
+export const findtaskWithFileByTaskId =  (taskId: string) => {
+  return  api<TaskWithFile>({ url: `/task/taskId/${taskId}`, method: "get" })
 }
 
-export const createTask = async (data: FormTask, hasData: Boolean) => {
+export const findtaskInfoByTaskId =  (taskId: string) => {
+  return  api<Task>({ url: `/task/info/${taskId}`, method: "get" })
+}
+
+export const getTaskByGroupId =  (groupId: string) => {
+  return  api<TaskMain[]>({ url: `/task/groupId/${groupId}`, method: "get" })
+}
+
+export const createTask =  (data: FormTask, hasData: Boolean) => {
   if (hasData)
-    return await api({
+    return  api({
       url: `/task`,
       data,
       method: "post",
       headers: { "Content-Type": "multipart/form-data" },
     })
   else
-    return await api({
+    return  api({
       url: `/task`,
       data: {
         name: data.name,
@@ -34,24 +42,24 @@ export const createTask = async (data: FormTask, hasData: Boolean) => {
     })
 }
 
-export const deleteTask = async (data: string[]) => {
-  return await api({ url: "/task", data: { ids: data }, method: "delete" })
+export const deleteTask =  (data: string[]) => {
+  return  api({ url: "/task", data: { ids: data }, method: "delete" })
 }
 
-export const deleteTaskFile = async (taskId: string) => {
-  return await api({ url: `/task/file/${taskId}`, method: "delete" })
+export const deleteTaskFile =  (taskId: string) => {
+  return  api({ url: `/task/file/${taskId}`, method: "delete" })
 }
 
-export const modifyTask = async (data: ModifyTask, hasData: Boolean) => {
+export const modifyTask =  (data: ModifyTask, hasData: Boolean) => {
   if (hasData) {
-    return await api({
+    return  api({
       url: "/task",
       data,
       method: "patch",
       headers: { "Content-Type": "multipart/form-data" },
     })
   } else {
-    return await api({
+    return  api({
       url: "/task",
       data: {
         id: data.id,

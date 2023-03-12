@@ -1,9 +1,11 @@
 export type File = {
   id: string
   taskId: string
-  uploadUser: string
+  member: string
+  message: string
   uploadTime: Date
   filePath: string
+  status: boolean
 }
 
 export type UploadFile = {
@@ -16,3 +18,4 @@ export type UpdateFile = {
   taskId: string
   file: Blob
 }
+

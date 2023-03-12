@@ -1,13 +1,10 @@
 <template>
-  <div>
-123
+  <div flex flex-col flex-grow m-4 rounded-xl >
+    <userHeaderItem mb-4/>
+    <userMainItem />
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
-
-<style scoped>
-
-</style>
+<style scoped></style>

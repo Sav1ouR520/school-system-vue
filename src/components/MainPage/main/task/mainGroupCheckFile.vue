@@ -53,30 +53,34 @@
 
 <script setup lang="ts">
 import { findFileBytaskId, goBackFileByTaskId } from "@/api/file"
+import type { MemberWithTask } from "@/interface/member"
 import { GroupPage } from "@/stores/pages/GroupPage"
+import { TaskPage } from "@/stores/pages/TaskPage"
 import moment from "moment"
 
-const page = GroupPage()
-const getData = async () => (await findFileBytaskId(page.click.id)).data
-const data = ref(await getData())
-
+const task = TaskPage()
+const group = GroupPage()
+const getData = () => findFileBytaskId(group.click.id).then(items => (data.value = items.data as MemberWithTask))
+const data = ref<MemberWithTask>({ member: [], task: { id: "", name: "", introduce: "", memberId: "", groupId: "", activeStatue: true, dataPath: null, createTime: new Date(), member: { id: "", name: "", groupId: "", userId: "", role: "admin", joinTime: new Date(), icon: "" } } })
+getData()
 const downloadFile = (filePath: string) => {
   window.location.href = "/data/file/" + filePath
 }
 const goBack = async (id: string, name: string) => {
   await goBackFileByTaskId(id)
-  data.value = await getData()
-  page.update = { time: new Date().valueOf(), type: "task" }
+  getData()
+  group.update = { time: new Date().valueOf(), type: "task" }
   ElNotification({ message: `成功退回${name}提交的文件`, type: "success" })
+  task.time = new Date().valueOf()
 }
 
 // === 监听数据变化 ===
-const clickid = ref(page.click.id)
-page.$subscribe(
+const clickid = ref(group.click.id)
+group.$subscribe(
   async (mutation, state) => {
     if (state.click.type === "task" && state.click.status === "check" && clickid.value !== state.click.id) {
-      clickid.value = page.click.id
-      data.value = await getData()
+      clickid.value = group.click.id
+      getData()
     }
   },
   { detached: true, deep: true },
