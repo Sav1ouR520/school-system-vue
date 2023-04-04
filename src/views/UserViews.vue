@@ -2,8 +2,8 @@
   <div flex flex-col flex-grow m-4 rounded-xl>
     <userHeaderItem mb-4 />
     <userMainItem mb-4 />
-    <el-scrollbar rounded-xl border-2>
-      <adminControlItem v-if="user.role === 'admin'" />
+    <el-scrollbar rounded-xl border-2 v-if="user.role === 'admin'" >
+      <adminControlItem />
     </el-scrollbar>
   </div>
 </template>

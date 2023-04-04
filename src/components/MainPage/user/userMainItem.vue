@@ -1,7 +1,7 @@
 <template>
   <div flex flex-col rounded-xl w-full p-4 border-2 bg-white>
     <div flex items-center justify-between h-8 font-bold>
-      <span text-xl>账 号 信 息</span>
+        <span text-xl >账 号 信 息</span>
       <span border-2 rounded :class="user.status ? 'bg-green' : 'bg-gray-5'" text-white px-1>{{ user.status ? "正 常" : "封 禁" }}</span>
     </div>
     <div flex w-full>
@@ -9,7 +9,7 @@
         <el-avatar cursor-pointer @dragstart.prevent :size="80" h-25 :src="user.icon ? '/data/user/' + user.icon : null" @click="modifyIconOpen()">
           <i-ic:baseline-image text-4xl />
         </el-avatar>
-        <div mt-2 text-2 font-bold border-2 rounded px-1 :class="user.role==='admin'?'bg-yellow':'bg-blue'"  text-white>{{ user.role.toLocaleUpperCase() }}</div>
+        <div mt-2 text-2 font-bold border-2 rounded px-1 :class="user.role === 'admin' ? 'bg-yellow' : 'bg-blue'" text-white>{{ user.role.toLocaleUpperCase() }}</div>
       </div>
       <div flex h-35 flex-col font-bold justify-between flex-grow p-2>
         <div flex items-center>
@@ -26,7 +26,7 @@
         </div>
         <div flex items-center>
           <span mr-1 flex justify-end>时间:</span>
-          <span border-2 rounded text-1 bg-gray-5 text-white px-1> {{user.registerTime!==null? moment(user.registerTime).format("YYYY-MM-DD HH:mm:ss"):"" }}</span>
+          <span border-2 rounded text-1 bg-gray-5 text-white px-1> {{ user.registerTime !== null ? moment(user.registerTime).format("YYYY-MM-DD HH:mm:ss") : "" }}</span>
         </div>
       </div>
     </div>
@@ -39,6 +39,7 @@
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 import { UserPage } from "@/stores/pages/UserPage"
 import moment from "moment"
+import { TokenStore } from "@/stores/TokenStore"
 
 const switchAside = SwitchAside()
 const user = UserPage()

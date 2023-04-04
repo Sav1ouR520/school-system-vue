@@ -11,6 +11,7 @@
       </div>
     </template>
     <template #extra>
+      <el-button type="info"  @click="logout">登出</el-button>
       <el-button type="primary" @click="addOpen()">修改密码</el-button>
       <userModifyPassWordItem :dialog="modifyDialogVisible" @close-dialog="modifyClose" />
     </template>
@@ -18,8 +19,18 @@
 </template>
 
 <script setup lang="ts">
+import { TokenStore } from "@/stores/TokenStore";
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 const switchAside = SwitchAside()
+
+// === 登出 ===
+const tokenStore = TokenStore()
+const logout = () => {
+  tokenStore.$reset()
+  router.push("/")
+}
+// ============
+
 
 // === 更新跳转 ===
 const router = useRouter()

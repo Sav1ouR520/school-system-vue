@@ -67,6 +67,7 @@ const sumbit = (formEl: FormInstance | undefined) => {
       const data = await login(user)
       ElMessage({ message: data.message, type: data.action ? "success" : "error" })
       if (data.action) {
+        captcha.reset()
         router.push({ name: "main" })
       } else {
         captcha.reset()
