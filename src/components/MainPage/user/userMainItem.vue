@@ -39,7 +39,6 @@
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 import { UserPage } from "@/stores/pages/UserPage"
 import moment from "moment"
-import { TokenStore } from "@/stores/TokenStore"
 
 const switchAside = SwitchAside()
 const user = UserPage()
