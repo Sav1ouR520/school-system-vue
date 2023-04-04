@@ -121,6 +121,7 @@ const sumbit = (formEl: FormInstance | undefined) => {
         cancel(formEl)
         ElNotification({ message: `成功修改用户密码`, type: "success" })
       } else {
+        ElNotification({ message: `修改用户密码失败`, type: "success" })
         captcha.codeErrorMeg = data.message
         captcha.reset()
       }

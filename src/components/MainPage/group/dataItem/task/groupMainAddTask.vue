@@ -105,13 +105,18 @@ const cancel = (formEl: FormInstance | undefined) => {
   send()
 }
 
-const sumbitAction = async (formEl: FormInstance) => {
-  await createTask(formTask, hasData.value && fileList.value.length !== 0)
-  ElNotification({ message: `成功创建任务${formTask.name}`, type: "success" })
-  cancel(formEl)
-  emit("add-task", true)
-  group.update.type = "group"
-  group.update.time = task.time = new Date().valueOf()
+const sumbitAction = (formEl: FormInstance) => {
+  createTask(formTask, hasData.value && fileList.value.length !== 0)
+    .then(() => {
+      ElNotification({ message: `成功创建任务${formTask.name}`, type: "success" })
+      emit("add-task", true)
+      group.update.type = "task"
+      group.update.time = task.time = new Date().valueOf()
+    })
+    .catch(() => {
+      ElNotification({ message: `创建任务${formTask.name}失败`, type: "error" })
+    })
+    .finally(() => cancel(formEl))
 }
 
 const sumbit = (formEl: FormInstance | undefined) => {

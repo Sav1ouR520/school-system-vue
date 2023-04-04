@@ -66,7 +66,7 @@ const getData = () =>
     backup.role = data.data!.role
     backup.name = data.data!.name
   })
-const reset = () => ({ id: "", name: "", groupId: "", role: "" as "user", joinTime: "", icon: "", userId: "" })
+const reset = () => ({ id: "", name: "", groupId: "", role: "" as "user", joinTime: new Date, icon: "", userId: "" })
 const formMember = ref<Member>(reset())
 const ruleFormRef = ref<FormInstance>()
 const rules = reactive<{ name: Array<FormItemRule> }>({
@@ -77,16 +77,21 @@ const sumbit = (formEl: FormInstance | undefined) => {
   formEl.validate(async valid => {
     if (valid) {
       const data = { id: formMember.value.id, groupId: formMember.value.groupId, name: formMember.value.name }
+      let result = null
       if (formMember.value.role !== backup.role && formMember.value.name !== backup.name) {
-        await modifyMemberWithAdmin({ ...data, role: formMember.value.role, name: formMember.value.name })
+        result = modifyMemberWithAdmin({ ...data, role: formMember.value.role, name: formMember.value.name })
       } else if (formMember.value.role !== backup.role) {
-        await modifyMemberWithAdmin({ ...data, role: formMember.value.role })
+        result = modifyMemberWithAdmin({ ...data, role: formMember.value.role })
       } else if (formMember.value.name !== backup.name) {
-        await modifyMemberWithAdmin({ ...data, name: formMember.value.name })
+        result = modifyMemberWithAdmin({ ...data, name: formMember.value.name })
       }
       if (formMember.value.role !== backup.role || formMember.value.name !== backup.name) {
-        page.update = { type: "member", time: new Date().valueOf() }
-        ElNotification({ message: `成功修改用户信息`, type: "success" })
+        result
+          ?.then(() => {
+            page.update = { type: "member", time: new Date().valueOf() }
+            ElNotification({ message: `成功修改用户信息`, type: "success" })
+          })
+          .catch(() => ElNotification({ message: `修改用户信息失败`, type: "error" }))
       }
       close()
     }

@@ -1,5 +1,5 @@
 <template>
-  <div m-4 p-4 rounded-xl bg-white h-25>
+  <div m-4 p-4 rounded-xl bg-white >
     <el-page-header @back="jump()">
       <template #breadcrumb>
         <el-breadcrumb separator="/">

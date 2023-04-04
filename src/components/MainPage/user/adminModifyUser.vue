@@ -1,7 +1,14 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="修改头像" width="30rem" :before-close="send" draggable align-center>
+  <el-dialog v-model="dialogVisible" title="修改用户信息" width="30rem" :before-close="send" draggable align-center>
     <el-form hide-required-asterisk status-icon :rules="rules" :model="formUser" size="large" ref="ruleFormRef" @submit.prevent>
-      <el-form-item label="头像" prop="icon">
+      <el-form-item label="名称" prop="username">
+        <el-input :disabled="page.id === props.userId" v-model="formUser.username" placeholder="请输入新名称">
+          <template #prefix>
+            <i-ep-user></i-ep-user>
+          </template>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="头像">
         <div flex w-full items-center>
           <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow>
             <p text-blue>拖拽文件或点击上传</p>
@@ -16,23 +23,51 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="cancel(ruleFormRef)">取消</el-button>
-      <el-button type="primary" @click="sumbit(ruleFormRef)">修改</el-button>
+      <div flex justify-between>
+        <div flex>
+          <div mr-4>
+            <span text-sm mr-3 text-gray-700>状态</span>
+            <el-switch :disabled="page.id === props.userId" v-model="formUser.status" inline-prompt active-text="正常" inactive-text="封禁" />
+          </div>
+          <div>
+            <span text-sm mr-3 text-gray-700>权限</span>
+            <el-switch :disabled="page.id === props.userId" v-model="formUser.role" inline-prompt active-value="admin" inactive-value="user" active-text="管理" inactive-text="普通" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #409eff" />
+          </div>
+        </div>
+        <div>
+          <el-button @click="cancel(ruleFormRef)">取消</el-button>
+          <el-button type="primary" v-if="page.id !== props.userId" @click="sumbit(ruleFormRef)">修改</el-button>
+          <el-button type="primary" v-else @click="cancel(ruleFormRef)">确认</el-button>
+        </div>
+      </div>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { getUserInfo, updateUserIcon } from "@/api/user"
+import { adminGetUserInfo, adminUpdateUser } from "@/api/user"
+import type { UpdataUser } from "@/interface/user"
 import { UserPage } from "@/stores/pages/UserPage"
 import { genFileId, type FormInstance, type UploadProps, type UploadRawFile, type UploadInstance, type FormItemRule } from "element-plus"
 
-const user = UserPage()
 // === 开关diglog 使用Props和Emits作为父子组件通信[可以pinia] ===
 const dialogVisible = ref<boolean>(false)
-const props = defineProps<{ dialog: boolean }>()
+const props = defineProps<{ dialog: boolean; userId: string }>()
 watch(props, async () => {
   dialogVisible.value = props.dialog
+  if (dialogVisible.value) {
+    formUser.id = props.userId
+    adminGetUserInfo(props.userId)
+      .then(data => {
+        formUser.username = data.data.username
+        formUser.status = data.data.status
+        formUser.role = data.data.role
+      })
+      .catch(() => {
+        location.reload()
+        ElNotification({ message: `你没有足够的权限`, type: "error" })
+      })
+  }
 })
 const emit = defineEmits<{
   (e: "close-dialog", value: boolean): void
@@ -41,6 +76,10 @@ const send = () => {
   emit("close-dialog", false)
 }
 // ===========================================================
+
+// === 获取用户信息 ===
+const page = UserPage()
+// ===================
 
 // === 上传文件功能 ===
 const upload = ref<UploadInstance>()
@@ -58,7 +97,6 @@ const handleChange: UploadProps["onChange"] = uploadFile => {
     reader.onload = e => {
       option.img = e.target?.result as string
     }
-    formUser.icon = true
     ruleFormRef.value?.clearValidate()
   }
 }
@@ -85,25 +123,27 @@ const option = reactive({
 const cancelImage = () => {
   option.img = ""
   upload.value!.clearFiles()
-  formUser.icon = false
 }
 // ===================
 
 // === 表单认证 ====
 const ruleFormRef = ref<FormInstance>()
-const formUser = reactive({ icon: false })
-const rules = reactive<{ icon: Array<FormItemRule> }>({
-  icon: [
-    {
-      required: true,
-      trigger: "blur",
-      validator: (_, value, callback) => (value ? callback() : callback(new Error("未上传图片"))),
-    },
-    {
-      required: true,
-      trigger: "change",
-      validator: (_, value, callback) => (value ? callback() : callback(new Error("未上传图片"))),
-    },
+const formUser = reactive<UpdataUser>({ id: "", username: "unkown", status: true, role: "user" })
+const checkUsername = (value: string, callback: any) => {
+  if (value.length < 6) {
+    callback(new Error("名称长度不能少于6位"))
+  } else if (value.length > 20) {
+    callback(new Error("名称长度超过于20位"))
+  } else {
+    callback()
+  }
+}
+const rules = reactive<{ username: Array<FormItemRule> }>({
+  username: [
+    { required: true, message: "请输入新名称", trigger: "blur" },
+    { required: true, message: "请输入新名称", trigger: "change" },
+    { required: true, trigger: "change", validator: (_, value, callback) => checkUsername(value, callback) },
+    { required: true, trigger: "blur", validator: (_, value, callback) => checkUsername(value, callback) },
   ],
 })
 const cancel = (formEl: FormInstance | undefined) => {
@@ -116,19 +156,16 @@ const sumbit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate(async valid => {
     if (valid) {
-      await cropper.value.getCropBlob(async (data: Blob) => {
-        const file = new File([data], "clipImage" + data.type.split("/")[1], { type: data.type })
-        const result = await updateUserIcon(file)
-        if (result.action) {
-          ElNotification({ message: `成功修改用户头像${user.username}`, type: "success" })
-        } else {
-          ElNotification({ message: `修改用户头像${user.username}失败`, type: "error" })
-        }
-        cancel(formEl)
-        getUserInfo().then(data => {
-          user.$state = data.data
+      if (option.img !== "") {
+        await cropper.value.getCropBlob(async (data: Blob) => {
+          const file = new File([data], "clipImage" + data.type.split("/")[1], { type: data.type })
+          await adminUpdateUser(formUser, file)
         })
-      })
+      }
+      adminUpdateUser(formUser)
+        .then(() => ElNotification({ message: `成功修改用户信息`, type: "success" }))
+        .catch(() => ElNotification({ message: `修改用户信息失败`, type: "error" }))
+        .finally(() => cancel(formEl))
     }
   })
 }

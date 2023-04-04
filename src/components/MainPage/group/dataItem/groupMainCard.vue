@@ -1,6 +1,6 @@
 <template>
   <div m-2 mt-0 flex items-center>
-    <span mr-4 font-bold>{{ name }}</span>
+    <span mr-4 font-bold text-blue cursor-pointer @click="refresh()">{{ name }}</span>
     <span text-sm flex-grow>{{ num }}</span>
     <div flex items-center justify-between  v-if="page.userRole === 'admin'">
       <slot name="icon"></slot>
@@ -37,6 +37,7 @@ const props = defineProps<{
   add: Function
   minus: Boolean
   sumbit: Function
+  refresh:Function
 }>()
 const emit = defineEmits<{
   (e: "change-modify-status", value: boolean): void

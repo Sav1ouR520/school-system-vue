@@ -2,7 +2,7 @@
   <groupMainAddMember :dialog="addDialogVisible" @close-dialog="addClose" @add-member="refresh" />
   <mainGroupModifyMember :dialog="modifyDialogVisible" @close-dialog="modifyClose" @modify-member="refresh" :memberId="memberId" />
   <mainGroupCheckMember :dialog="checkDialogVisible" @close-dialog="checkClose" :memberId="memberId" />
-  <groupMainCard name="群成员" :num="members.length" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
+  <groupMainCard name="群成员" :num="members.length" :refresh="refreshData" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
     <template v-slot:list>
       <el-scrollbar>
         <div items-center border border-transparent hover:border-current cursor-pointer :class="[deleteActive ? 'hover:bg-red-100' : '', modifyAcitve ? 'hover:bg-blue-100' : '', chooseList.includes(`${member.id}`) ? 'text-red' : 'text-black']" v-for="member in members" :key="member.id" @click="choose(`${member.id}`)">
@@ -34,7 +34,7 @@ import { SwitchAside } from "@/stores/switch/SwitchAside"
 
 const page = GroupPage()
 const getMember = () => {
-  findMemberByGroupId(page.group.id).then(data => {
+  return findMemberByGroupId(page.group.id).then(data => {
     members.value = data!.data as GroupMember[]
     page.item.members = members.value.length
   })
@@ -42,6 +42,14 @@ const getMember = () => {
 const members = ref<GroupMember[]>([])
 getMember()
 
+const refreshData = () => {
+  getMember()
+    .then(() => ElNotification({ message: `成功刷新成员`, type: "success" }))
+    .catch(() => {
+      page.update = { time: new Date().valueOf(), type: "all" }
+      ElNotification({ message: `刷新成员失败`, type: "error" })
+    })
+}
 // === 打开添加的diglog ===
 const switchAside = SwitchAside()
 const addDialogVisible = ref<Boolean>(false)
@@ -64,7 +72,10 @@ const timer = ref(0)
 page.$subscribe(
   async (mutation, state) => {
     const updateTime = state.update.time
-    if (state.update.type === "member" && updateTime > timer.value) {
+    if (state.update.type === "all") {
+      modifyAcitve.value = deleteActive.value = false
+    }
+    if ((state.update.type === "member" || state.update.type === "all") && updateTime > timer.value) {
       timer.value = updateTime
       getMember()
     }
@@ -134,11 +145,14 @@ const choose = (id: string) => {
 // ===============
 
 // === 提交删除请求 ===
-const sumbit = async () => {
+const sumbit = () => {
   if (chooseList.value.length !== 0) {
-    await deleteMember(chooseList.value)
-    getMember()
-    ElNotification({ message: `成功删除成员`, type: "success" })
+    deleteMember(chooseList.value)
+      .then(() => {
+        getMember()
+        ElNotification({ message: `成功删除成员`, type: "success" })
+      })
+      .catch(() => ElNotification({ message: `删除成员失败`, type: "error" }))
   }
 }
 // ===================

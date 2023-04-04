@@ -80,9 +80,7 @@ const router = createRouter({
           },
           beforeEnter: (to, from, next) => {
             const tokenStore = TokenStore()
-            const page = GroupPage()
             if (!tokenStore.verification) next({ name: "login" })
-            if (page.group.id === "") next({ name: "main" })
             else next()
           },
         },

@@ -20,8 +20,19 @@
 import { GroupPage } from "@/stores/pages/GroupPage"
 
 // === 查询组的信息 ===
-const page = GroupPage()
-page.getGroup()
+const group = GroupPage()
+group.getGroup()
+const timer = ref(0)
+group.$subscribe(
+  (mutation, state) => {
+    const updateTime = state.update.time
+    if ((state.update.type === "group" || state.update.type === "all") && updateTime > timer.value) {
+      timer.value = updateTime
+      group.getGroup()
+    }
+  },
+  { detached: true, deep: true },
+)
 // ==========================
 
 // === 屏幕检测 ===

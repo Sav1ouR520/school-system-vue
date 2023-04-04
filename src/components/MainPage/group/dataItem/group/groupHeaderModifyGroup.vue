@@ -130,11 +130,15 @@ const rules = reactive<{ name: Array<FormItemRule> }>({
     { required: true, message: "组名不能为空", trigger: "change" },
   ],
 })
-const remove = async () => {
-  await deleteGroup(page.group.id)
-  page.$reset()
-  router.push(`/main`)
-  ElNotification({ message: `成功删除组${formGroup.value.name}`, type: "success" })
+const remove = () => {
+  deleteGroup(page.group.id)
+    .then(() => {
+      ElNotification({ message: `成功删除组${formGroup.value.name}`, type: "success" })
+      page.$reset()
+      page.update = { time: new Date().valueOf(), type: "group" }
+      router.push(`/main`)
+    })
+    .catch(() => ElNotification({ message: `删除组${formGroup.value.name}失败`, type: "error" }))
 }
 const cancel = (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -142,16 +146,22 @@ const cancel = (formEl: FormInstance | undefined) => {
   formEl.resetFields()
   send()
 }
-const sumbitAction = async (formEl: FormInstance, icon?: File) => {
-  await modifyGroup({ ...formGroup.value, icon })
-  cancel(formEl)
-  emit("add-group", new Date().valueOf())
-  page.getGroup()
-  formGroup.value = reset()
-  page.update = { time: new Date().valueOf(), type: "group" }
-  ElNotification({ message: `成功修改组${formGroup.value.name}`, type: "success" })
-  const task = TaskPage()
-  task.time = new Date().valueOf()
+const sumbitAction = (formEl: FormInstance, icon?: File) => {
+  modifyGroup({ ...formGroup.value, icon })
+    .then(() => {
+      ElNotification({ message: `成功修改组${formGroup.value.name}`, type: "success" })
+      emit("add-group", new Date().valueOf())
+      page.getGroup()
+      page.update = { time: new Date().valueOf(), type: "group" }
+      const task = TaskPage()
+      task.time = new Date().valueOf()
+    }).catch(() =>
+      ElNotification({ message: `修改组${formGroup.value.name}失败`, type: "error" })
+    )
+    .finally(() => {
+      cancel(formEl)
+      formGroup.value = reset()
+    })
 }
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return

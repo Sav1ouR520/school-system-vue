@@ -1,4 +1,4 @@
-import type { UserPageInfo, LoginUser, RegisterUser, ModifyUserPassWord } from "@/interface/user"
+import type { UserPageInfo, LoginUser, RegisterUser, ModifyUserPassWord, FindAllUser, UpdataUser, UserList } from "@/interface/user"
 import { Encrypt } from "@/utils/cryptoAES"
 import api from "@/utils/request"
 import { getCookie } from "@/api/cookie"
@@ -57,4 +57,21 @@ export const updateUserPassword = async (data: ModifyUserPassWord) => {
 
 export const updateUserUsername = (data: { username: string }) => {
   return api({ url: "/user/username", data, method: "PATCH" })
+}
+
+export const findAll = (params?: FindAllUser) => {
+  return api<UserList>({ url: "/user/all", params, method: "GET" })
+}
+
+export const adminGetUserInfo = (id: string) => {
+  return api<UserPageInfo>({ url: "/user/userId/" + id, method: "GET" })
+}
+
+export const adminUpdateUser = (user: UpdataUser, icon?: File) => {
+  return api({
+    url: "/user/" + user.id,
+    data: { ...user, id: undefined, icon },
+    method: "patch",
+    headers: { "Content-Type": "multipart/form-data" },
+  })
 }

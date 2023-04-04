@@ -40,12 +40,19 @@ const send = () => {
 }
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  formEl.validate(async valid => {
+  formEl.validate(valid => {
     if (valid) {
-      await joinGroupByInviteCode(code.inviteCode)
-      ElNotification({ message: `成功加入组`,type: "success"})
-      send()
-      emit("join-group", new Date().valueOf())
+      joinGroupByInviteCode(code.inviteCode)
+        .then(data => {
+          if (data.action) {
+            ElNotification({ message: `成功加入组`, type: "success" })
+            emit("join-group", new Date().valueOf())
+          } else {
+            ElNotification({ message: `用户已经在组里`, type: "error" })
+          }
+        })
+        .catch(() => ElNotification({ message: `邀请码无效/组不存在`, type: "error" }))
+        .finally(() => send())
     }
   })
 }

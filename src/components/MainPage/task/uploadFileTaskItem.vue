@@ -1,6 +1,11 @@
 <template>
   <div flex items-center m-2 mt-0 h-10>
-    <div font-bold text-2xl flex-grow>任务名: {{ data!.task.name }}</div>
+    <div flex items-center flex-grow font-bold h-8>
+      <span text-2xl>任务名:</span>
+      <div flex items-center mt-1 px-1 ml-2 h-8 border-2 bg-black rounded text-white>
+        <span font-bold>{{ data!.task.name }}</span>
+      </div>
+    </div>
     <div flex items-center text-2 px-2 h-8 border-2 :class="data!.File?'bg-green':'bg-black'" rounded text-white>
       <span font-bold>{{ data!.File ? "完成" : "未完成" }}</span>
     </div>
@@ -74,13 +79,19 @@ const refreshData = () => {
   } else {
     request = findtaskWithFileByTaskId(group.click.id)
   }
-  request.then(items => {
-    data.value = items.data as TaskWithFile
-    if (items.data?.File) {
-      uploadFrom.id = items.data.File.id
-    }
-    uploadFrom.taskId = items.data!.task.id
-  })
+  request
+    .then(items => {
+      data.value = items.data as TaskWithFile
+      if (items.data?.File) {
+        uploadFrom.id = items.data.File.id
+      }
+      uploadFrom.taskId = items.data!.task.id
+    })
+    .catch(() => {
+      ElNotification({ message: `任务不存在`, type: "error" })
+      router.push("/main/group")
+      group.update = { time: new Date().valueOf(), type: "task" }
+    })
 }
 // ================
 
@@ -190,18 +201,25 @@ const sumbit = (formEl: FormInstance | undefined) => {
         if (val.raw) files.push(val.raw)
       })
       uploadFrom.file = await FileZip(files)
+      let result = null
       if (data.value?.File) {
-        await modifyFile(uploadFrom)
+        result = modifyFile(uploadFrom)
       } else {
-        await uploadFile({ taskId: uploadFrom.taskId, file: uploadFrom.file })
+        result = uploadFile({ taskId: uploadFrom.taskId, file: uploadFrom.file })
       }
-      refreshData()
-      ElNotification({ message: `成功提交文件`, type: "success" })
-      if (routerName === "groupTask") {
-        group.update = { time: new Date().valueOf(), type: "task" }
-      }
-      task.time = new Date().valueOf()
-      cancelFile()
+      result
+        .then(() => {
+          refreshData()
+          ElNotification({ message: `成功提交文件`, type: "success" })
+          if (routerName === "groupTask") {
+            group.update = { time: new Date().valueOf(), type: "task" }
+          }
+          task.time = new Date().valueOf()
+          cancelFile()
+        })
+        .catch(() => {
+          ElNotification({ message: `提交文件失败`, type: "error" })
+        })
     }
   })
 }

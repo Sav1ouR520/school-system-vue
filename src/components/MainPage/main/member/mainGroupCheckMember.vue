@@ -54,7 +54,7 @@ const close = () => {
 // === 数据获取 ===
 const page = GroupPage()
 const getData = () => findMemberByMemberId(page.group.id, props.memberId).then(data => (member.value = data.data as Member))
-const reset = () => ({ id: "", name: "", groupId: "", role: "" as "user", joinTime: "", icon: "", userId: "" })
+const reset = () => ({ id: "", name: "", groupId: "", role: "" as "user", joinTime: new Date(), icon: "", userId: "" })
 const member = ref<Member>(reset())
 // ===============
 </script>

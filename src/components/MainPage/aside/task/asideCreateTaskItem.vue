@@ -43,7 +43,7 @@ const jump = (taskId: string) => {
 const page = TaskPage()
 const timer = ref(0)
 page.$subscribe(
-  async (mutation, state) => {
+  (mutation, state) => {
     const updateTime = state.time
     if (updateTime > timer.value) {
       timer.value = updateTime

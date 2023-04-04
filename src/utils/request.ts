@@ -49,6 +49,8 @@ request.interceptors.response.use(
     } else if (error.response.status === 403) {
       const tokenStore = TokenStore()
       tokenStore.$reset()
+      router.push("/")
+      ElNotification({ message: `账号被封禁`, type: "error" })
     }
     return Promise.reject(error.response)
   },

@@ -10,7 +10,7 @@ type GroupPageInfo = {
     tasks: number
   }
   update: {
-    type: "member" | "task" | "group" | null
+    type: "member" | "task" | "group" | "all" | null
     time: number
   }
   click: {
@@ -51,11 +51,21 @@ export const GroupPage = defineStore("GroupPage", {
   },
   actions: {
     async getGroup() {
+      const router = useRouter()
+      const group = GroupPage()
       const state = this.$state
-      const data = await Promise.all([findGroupByGroupId(this.group.id), findMemberByUserId(this.group.id)])
-      const group = data[0]!.data
-      const member = data[1]!.data
-      this.$state = group ? { ...state, group, userRole: member!.role } : state
+      Promise.all([findGroupByGroupId(this.group.id), findMemberByUserId(this.group.id)])
+        .then(data => {
+          const group = data[0]!.data
+          const member = data[1]!.data
+          this.$state = group ? { ...state, group, userRole: member!.role } : state
+        })
+        .catch(() => {
+          ElNotification({ message: `用户不属于该组/组不存在`, type: "error" })
+          group.$reset()
+          group.update = { time: new Date().valueOf(), type: "group" }
+          router.push("/main")
+        })
     },
   },
   persist: {

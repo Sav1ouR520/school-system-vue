@@ -103,11 +103,14 @@ const cancel = (formEl: FormInstance | undefined) => {
   formEl.resetFields()
   send()
 }
-const sumbitAction = async (formEl: FormInstance, icon?: File) => {
-  await addGroup({ ...formGroup, icon })
-  cancel(formEl)
-  emit("add-group", new Date().valueOf())
-  ElNotification({ message: `成功创建组${formGroup.name}`, type: "success" })
+const sumbitAction = (formEl: FormInstance, icon?: File) => {
+  addGroup({ ...formGroup, icon })
+    .then(() => {
+      ElNotification({ message: `成功创建组${formGroup.name}`, type: "success" })
+      emit("add-group", new Date().valueOf())
+    })
+    .catch(() => ElNotification({ message: `创建组${formGroup.name}失败`, type: "error" }))
+    .finally(() => cancel(formEl))
 }
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return

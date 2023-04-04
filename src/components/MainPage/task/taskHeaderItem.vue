@@ -44,13 +44,16 @@ const group = GroupPage()
 
 // === 删除功能 ===
 const sumbit = async () => {
-  await deleteTask([task.id])
-  router.push(`/main`)
-  task.id = ""
-  task.type=null
-  group.update.type = "group"
-  group.update.time = task.time = new Date().valueOf()
-  ElNotification({ message: `成功删除任务`, type: "success" })
+  deleteTask([task.id])
+    .then(() => {
+      router.push(`/main`)
+      task.id = ""
+      task.type = null
+      group.update.type = "group"
+      group.update.time = task.time = new Date().valueOf()
+      ElNotification({ message: `成功删除任务`, type: "success" })
+    })
+    .catch(() => ElNotification({ message: `删除任务失败`, type: "error" }))
 }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <groupMainAddTask :dialog="dialogVisible" @close-dialog="close" @add-task="add" />
-  <groupMainCard name="群任务" :num="tasks.length" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
+  <groupMainCard name="群任务" :num="tasks.length" :refresh="refreshData" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
     <template #icon>
       <div flex items-center justify-between rounded-full cursor-pointer @click="changeCheck()" :class="checkActive ? 'text-blue' : ''" @dragstart.prevent>
         <i-ic:baseline-list-alt />
@@ -32,13 +32,22 @@ import { useRouter } from "vue-router"
 // === 初始化数据 ===
 const router = useRouter()
 const group = GroupPage()
-const getTask = () =>
-  getTaskByGroupId(group.group.id).then(data => {
+const getTask = () => {
+  return getTaskByGroupId(group.group.id).then(data => {
     tasks.value = data.data as TaskMain[]
     group.item.tasks = tasks.value.length ? tasks.value.length : 0
   })
+}
 const tasks = ref<TaskMain[]>([])
 getTask()
+const refreshData = () => {
+  getTask()
+    .then(() => ElNotification({ message: `成功刷新任务`, type: "success" }))
+    .catch(() => {
+      group.update = { time: new Date().valueOf(), type: "all" }
+      ElNotification({ message: `刷新任务失败`, type: "error" })
+    })
+}
 // ================
 
 // === 数据更改监听 ===
@@ -46,7 +55,10 @@ const timer = ref(0)
 group.$subscribe(
   async (mutation, state) => {
     const updateTime = state.update.time
-    if (state.update.type === "task" && updateTime > timer.value) {
+    if (state.update.type === "all") {
+      checkActive.value = modifyAcitve.value = deleteActive.value = false
+    }
+    if ((state.update.type === "task" || state.update.type === "all") && updateTime > timer.value) {
       timer.value = updateTime
       getTask()
     }
@@ -120,20 +132,23 @@ const choose = (id: string) => {
 // ===============
 
 // === 提交删除请求 ===
-const sumbit = async () => {
+const sumbit = () => {
   if (chooseList.value.length !== 0) {
     const list = chooseList.value
-    await deleteTask(chooseList.value)
-    if (list.includes(group.click.id)) {
-      router.push(`/main/group`)
-      group.click.id = ""
-      group.click.type = null
-    }
-    getTask()
-    ElNotification({ message: `成功删除任务`, type: "success" })
-    const task = TaskPage()
-    group.update.type = "group"
-    group.update.time = task.time = new Date().valueOf()
+    deleteTask(chooseList.value)
+      .then(() => {
+        if (list.includes(group.click.id)) {
+          router.push(`/main/group`)
+          group.click.id = ""
+          group.click.type = null
+        }
+        getTask()
+        const task = TaskPage()
+        group.update.type = "group"
+        group.update.time = task.time = new Date().valueOf()
+        ElNotification({ message: `成功删除任务`, type: "success" })
+      })
+      .catch(() => ElNotification({ message: `删除任务失败`, type: "error" }))
   }
 }
 // ===================

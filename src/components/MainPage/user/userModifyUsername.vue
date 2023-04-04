@@ -4,7 +4,7 @@
       <el-form-item label="名称" prop="username">
         <el-input v-model="formUser.username" placeholder="请输入新名称">
           <template #prefix>
-            <i-ep-lock></i-ep-lock>
+            <i-ep-user></i-ep-user>
           </template>
         </el-input>
       </el-form-item>
@@ -67,14 +67,17 @@ const cancel = (formEl: FormInstance | undefined) => {
 }
 const sumbit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  formEl.validate(async valid => {
+  formEl.validate(valid => {
     if (valid) {
-      await updateUserUsername(formUser)
-      cancel(formEl)
-      ElNotification({ message: `成功修改用户名称`, type: "success" })
-      getUserInfo().then(data => {
-        user.$state = data.data
-      })
+      updateUserUsername(formUser)
+        .then(() => ElNotification({ message: `成功修改用户名称`, type: "success" }))
+        .catch(() => ElNotification({ message: `修改用户名称失败`, type: "error" }))
+        .finally(() => {
+          cancel(formEl)
+          getUserInfo().then(data => {
+            user.$state = data.data
+          })
+        })
     }
   })
 }

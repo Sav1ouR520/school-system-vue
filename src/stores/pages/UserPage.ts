@@ -6,7 +6,7 @@ export const UserPage = defineStore("UserPage", {
     id: "",
     account: "",
     username: "",
-    activeStatue: true,
+    status: false,
     icon: "",
     role: "user",
     registerTime: null,

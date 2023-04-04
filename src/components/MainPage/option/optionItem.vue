@@ -28,7 +28,7 @@ watch(router.currentRoute, () => {
   routerName.value = router.currentRoute.value.name
 })
 const checkOtherPageWindow = () => {
-  return routerName.value !== "main" && window.width.value <= 768
+  return routerName.value !== "main" && window.width.value <= 1024
 }
 // ============
 </script>

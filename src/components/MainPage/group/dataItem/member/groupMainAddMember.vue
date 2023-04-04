@@ -18,13 +18,14 @@
 </template>
 
 <script setup lang="ts">
-import { getGroupInviteCode } from "@/api/group"
+import { getGroupInviteCode, updateInviteCode } from "@/api/group"
 import { GroupPage } from "@/stores/pages/GroupPage"
 
 // === 开关diglog 使用Props和Emits作为父子组件通信[可以pinia] ===
 const dialogVisible = ref<boolean>(false)
 const props = defineProps<{ dialog: boolean }>()
-const getData=()=>getGroupInviteCode(page.group.id).then(data => (source.value = data.data!.inviteCode))
+const getData = () => getGroupInviteCode(page.group.id).then(data => (source.value = data.data!.inviteCode))
+
 watch(props, async () => {
   dialogVisible.value = props.dialog
   if (props.dialog) getData()
@@ -53,7 +54,7 @@ const successCopy = () => {
   })
 }
 const refreshCode = async () => {
-  getData()
+  updateInviteCode(page.group.id).then(data => (source.value = data.data!.inviteCode))
   ElMessage({
     message: "刷新邀请码成功",
     type: "success",
