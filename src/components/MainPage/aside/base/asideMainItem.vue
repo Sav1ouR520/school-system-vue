@@ -19,6 +19,7 @@ const refresh = () => {
   isActive.value = false
   changeIcon()
   timer.value = new Date().valueOf()
+  ElNotification({ message: `成功刷新数据`, type: "success" })
 }
 const changeIcon = () => {
   isActive.value = !isActive.value

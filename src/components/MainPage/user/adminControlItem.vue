@@ -1,22 +1,24 @@
 <template>
   <div flex flex-grow flex-col rounded-xl w-full p-4 bg-white>
     <div flex :class="checkPageWindow() ? 'flex-col' : 'flex-row'" mb-4>
-      <div flex flex-row>
+      <div flex :class="window.width.value <= 500 ? 'flex-col' : 'flex-row'">
         <div flex items-center text-xl font-bold h-8 :class="checkPageWindow() ? 'flex-grow' : 'mr-8'">用 户 管 理</div>
-        <div flex items-center mr-4>
-          <span cursor-pointer font-bold mr-1 @click="condition.role.active = !condition.role.active" :class="condition.role.active ? 'text-green' : 'text-gray'">权限</span>
-          <el-switch :disabled="!condition.role.active" v-model="condition.role.value" active-value="admin" inactive-value="user" inline-prompt font-400 active-text="管理" inactive-text="普通" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #409eff" />
-        </div>
-        <div flex items-center mr-4>
-          <span cursor-pointer font-bold mr-1 @click="condition.status.active = !condition.status.active" :class="condition.status.active ? 'text-green' : 'text-gray'">状态</span>
-          <el-switch :disabled="!condition.status.active" v-model="condition.status.value" inline-prompt font-400 active-text="正常" inactive-text="封禁" />
-        </div>
-        <div flex items-center :class="checkPageWindow() ?'mr-7':''">
-          <span font-bold mr-1 @click="condition.registerTime.active = !condition.registerTime.active" :class="condition.registerTime.active ? 'text-green' : 'text-gray'">之后</span>
-          <el-date-picker value-format="YYYY-MM-DD" :disabled="!condition.registerTime.active" :editable="false" v-model="condition.registerTime.value" type="date" />
+        <div flex justify-between  >
+          <div flex items-center mr-4>
+            <span cursor-pointer font-bold mr-1 @click="condition.role.active = !condition.role.active" :class="condition.role.active ? 'text-green' : 'text-gray'">权限</span>
+            <el-switch :disabled="!condition.role.active" v-model="condition.role.value" active-value="admin" inactive-value="user" inline-prompt font-400 active-text="管理" inactive-text="普通" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #409eff" />
+          </div>
+          <div flex items-center mr-4>
+            <span cursor-pointer font-bold mr-1 @click="condition.status.active = !condition.status.active" :class="condition.status.active ? 'text-green' : 'text-gray'">状态</span>
+            <el-switch :disabled="!condition.status.active" v-model="condition.status.value" inline-prompt font-400 active-text="正常" inactive-text="封禁" />
+          </div>
+          <div flex items-center :class="checkPageWindow() ? 'mr-7' : ''">
+            <span font-bold mr-1 @click="condition.registerTime.active = !condition.registerTime.active" :class="condition.registerTime.active ? 'text-green' : 'text-gray'">之后</span>
+            <el-date-picker value-format="YYYY-MM-DD" :disabled="!condition.registerTime.active" :editable="false" v-model="condition.registerTime.value" type="date" />
+          </div>
         </div>
       </div>
-      <div flex flex-grow :class="checkPageWindow() ? 'mt-4' : 'ml-10'">
+      <div flex flex-grow :class="checkPageWindow() ? 'mt-2' : 'ml-10'">
         <el-select mr-2 v-model="condition.input.type" placeholder="条件查询">
           <el-option label="名称" value="username" />
           <el-option label="账号" value="account" />

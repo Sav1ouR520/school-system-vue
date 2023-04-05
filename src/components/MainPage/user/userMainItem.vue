@@ -1,8 +1,11 @@
 <template>
   <div flex flex-col rounded-xl w-full p-4 border-2 bg-white>
-    <div flex items-center justify-between h-8 font-bold>
-        <span text-xl >账 号 信 息</span>
-      <span border-2 rounded :class="user.status ? 'bg-green' : 'bg-gray-5'" text-white px-1>{{ user.status ? "正 常" : "封 禁" }}</span>
+    <div flex items-center justify-between h-8 font-bold pr-1>
+      <div flex items-center>
+        <span text-xl mr-1>账 号 信 息</span>
+        <span border-2 text-3 rounded :class="user.status ? 'bg-green' : 'bg-gray-5'" text-white px-1>{{ user.status ? "正 常" : "封 禁" }}</span>
+      </div>
+      <span border-2 rounded cursor-pointer text-4 bg-black text-white px-1 @click="logout">登出</span>
     </div>
     <div flex w-full>
       <div w-20 h-35 flex items-center flex-col justify-center mr-2>
@@ -25,8 +28,7 @@
           <span border-2 rounded text-1 bg-gray-5 text-white px-1>{{ user.username }}</span>
         </div>
         <div flex items-center>
-          <span mr-1 flex justify-end>时间:</span>
-          <span border-2 rounded text-1 bg-gray-5 text-white px-1> {{ user.registerTime !== null ? moment(user.registerTime).format("YYYY-MM-DD HH:mm:ss") : "" }}</span>
+          <span mr-1 flex justify-end>时间:</span> <span border-2 rounded text-1 bg-gray-5 text-white px-1> {{ user.registerTime !== null ? moment(user.registerTime).format("YYYY-MM-DD HH:mm:ss") : "" }}</span>
         </div>
       </div>
     </div>
@@ -39,9 +41,19 @@
 import { SwitchAside } from "@/stores/switch/SwitchAside"
 import { UserPage } from "@/stores/pages/UserPage"
 import moment from "moment"
+import { TokenStore } from "@/stores/TokenStore"
 
 const switchAside = SwitchAside()
 const user = UserPage()
+
+// === 登出 ===
+const tokenStore = TokenStore()
+const router = useRouter()
+const logout = () => {
+  tokenStore.$reset()
+  router.push("/")
+}
+// ============
 
 // === 修改用户icon的diglog ===
 const iconDialogVisible = ref<Boolean>(false)
