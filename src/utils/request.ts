@@ -40,14 +40,19 @@ request.interceptors.response.use(
     return response
   },
   async error => {
-    if (error.response.status === 401) {
-      const tokenStore = TokenStore()
-      tokenStore.refresh()
+    const tokenStore = TokenStore()
+    if (error.response.status === 401 && error.config.url === "/user/refresh") {
+      tokenStore.$reset()
+      router.push("/")
+      ElNotification({ message: `无效TOKEN`, type: "error" })
+    } else if (error.response.status === 401) {
       if (tokenStore.outOfrefreshDate) {
         tokenStore.$reset()
+        router.push("/")
       }
+      await tokenStore.refresh()
+      return request.request<ResponseData>(error.config)
     } else if (error.response.status === 403) {
-      const tokenStore = TokenStore()
       tokenStore.$reset()
       router.push("/")
       ElNotification({ message: `账号被封禁`, type: "error" })

@@ -119,7 +119,6 @@ const users = ref<UserInfo[]>([])
 const total = ref(0)
 const offset = ref(1)
 const search = () => {
-  console.log(offset.value)
   const conditions = {
     role: condition.role.active ? (condition.role.value as "user" | "admin") : undefined,
     registerTime: condition.registerTime.active ? condition.registerTime.value : undefined,

@@ -18,8 +18,8 @@ export const login = async (user: LoginUser) => {
 }
 
 export const refreshToken = async () => {
-  const tokenStore = TokenStore()
   const data = await api<ResponseTokens>({ url: "/user/refresh", method: "POST" })
+  const tokenStore = TokenStore()
   tokenStore.$state.accessToken = data.data!.tokens.accessToken
   tokenStore.$state.refreshToken = data.data!.tokens.refreshToken
 }

@@ -7,7 +7,6 @@ export const TokenStore = defineStore("TokenStore", {
   state: (): Tokens => ({
     accessToken: "",
     refreshToken: "",
-    needRequest: false,
   }),
   actions: {
     async refresh() {
@@ -15,33 +14,44 @@ export const TokenStore = defineStore("TokenStore", {
     },
   },
   getters: {
-    userId: state => {
+    userId(state) {
       if (state.accessToken) {
-        const accessToken: TokenPayload = jwt_decode(state.accessToken)
-        return accessToken.id
+        try {
+          const accessToken: TokenPayload = jwt_decode(state.accessToken)
+          return accessToken.id
+        } catch {
+          const router = useRouter()
+          state.accessToken = state.refreshToken = ""
+          router.push("/")
+        }
       }
     },
-    verification: (state): boolean => {
-      if (state.accessToken === "" || state.refreshToken === "") {
-        return false
-      }
-      return true
+    verification() {
+      return !this.outOfAccessDate || !this.outOfrefreshDate
     },
     outOfAccessDate: (state): boolean => {
       const nowTimeStamp = Math.floor(new Date().valueOf() / 1000)
-      if (state.accessToken !== "" || state.refreshToken !== "") {
-        const accessTokenTimeStamp: TokenPayload = jwt_decode(state.accessToken)
-        return nowTimeStamp > accessTokenTimeStamp.exp
+      try {
+        if (state.accessToken !== "" || state.refreshToken !== "") {
+          const accessTokenTimeStamp: TokenPayload = jwt_decode(state.accessToken)
+          return nowTimeStamp > accessTokenTimeStamp.exp
+        }
+        return true
+      } catch {
+        return true
       }
-      return false
     },
     outOfrefreshDate: (state): boolean => {
       const nowTimeStamp = Math.floor(new Date().valueOf() / 1000)
-      if (state.accessToken !== "" || state.refreshToken !== "") {
-        const refreshTokenTimeStamp: TokenPayload = jwt_decode(state.refreshToken)
-        return refreshTokenTimeStamp.exp < nowTimeStamp
+      try {
+        if (state.accessToken !== "" || state.refreshToken !== "") {
+          const refreshTokenTimeStamp: TokenPayload = jwt_decode(state.refreshToken)
+          return refreshTokenTimeStamp.exp < nowTimeStamp
+        }
+        return true
+      } catch {
+        return true
       }
-      return false
     },
   },
   persist: {
