@@ -8,11 +8,13 @@
       </div>
       <div flex-grow pl-2 text-gray-500>
         <div class="h-1/2" flex items-center font-bold>
-          <span flex-grow text-4 text-gray-700>{{ item.task.name }}</span>
-          <div flex items-center justify-center text-1 rounded border-2 p-0.5 text-white w-12 :class="item.task.file === item.group.member ? 'bg-green' : 'bg-black'">{{ item.task.file }}/{{ item.group.member }}</div>
+          <span flex-grow text-3 text-gray-700>{{ item.task.name }}</span>
+          <div flex items-center justify-center text-3 rounded border-2 p-0.5 text-white w-12
+            :class="item.task.file === item.group.member ? 'bg-green' : 'bg-black'">{{ item.task.file }}/{{
+              item.group.member }}</div>
         </div>
         <div class="h-1/2" flex items-center font-bold>
-          <span text-2>创建于: {{ item.group.name }}</span>
+          <span text-3>创建于: {{ item.group.name }}</span>
         </div>
       </div>
     </div>

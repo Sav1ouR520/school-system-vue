@@ -1,6 +1,6 @@
 <template>
   <div flex items-center m-2 mt-0 h-10>
-    <div flex items-center flex-grow font-bold text-2xl h-8>群任务</div>
+    <div flex items-center flex-grow font-bold text-3xl h-8>群任务</div>
     <div flex items-center text-xs px-1 ml-2 h-8 border-2 bg-black rounded text-white>
       <span>创建者:</span>
       <span font-bold>{{ data!.member.name }}</span>
@@ -33,7 +33,8 @@
       </div>
     </el-form-item>
     <el-form-item label="文件上传">
-      <el-upload flex flex-col flex-grow action="#" ref="upload" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" :auto-upload="false" :disabled="!hasData" multiple drag>
+      <el-upload flex flex-col flex-grow action="#" ref="upload" :file-list="fileList" :on-change="handleChange"
+        :on-remove="handleRemove" :auto-upload="false" :disabled="!hasData" multiple drag>
         <div flex justify-between :class="hasData ? 'text-blue' : ''">
           <div flex flex-grow items-center justify-center rounded-xl>
             <i-ep:upload-filled text-8.4 />

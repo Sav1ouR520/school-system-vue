@@ -1,7 +1,7 @@
 <template>
   <div flex items-center mx-2 mb-4 h-10>
     <div flex items-center flex-grow font-bold h-8>
-      <span text-2xl>任务名:</span>
+      <span text-3xl>任务名:</span>
       <div flex items-center mt-1 px-1 ml-2 h-8 bg-black rounded text-white>
         <span font-bold>{{ data!.task.name }}</span>
       </div>
@@ -18,7 +18,7 @@
   <div pt-0 flex-grow border-4 m-2 rounded>
     <table w-full>
       <thead h-12>
-        <tr align="center" text-4>
+        <tr align="center" text-3>
           <th pl-4 align="left">用户</th>
           <th>文件</th>
           <th>上传时间</th>
@@ -26,8 +26,8 @@
         </tr>
       </thead>
       <tbody align="center" font-bold h-12>
-        <tr v-for="member in data!.member" :key="member.id" >
-          <td pl-4 align="left" >{{ member.name }}</td>
+        <tr v-for="member in data!.member" :key="member.id">
+          <td pl-4 align="left">{{ member.name }}</td>
           <td v-if="member.file.length !== 0">
             <a cursor-pointer text-blue @click="downloadFile(member.file[0].filePath)">下载</a>
           </td>
@@ -35,7 +35,7 @@
           <td v-if="member.file.length !== 0">
             <a cursor-pointer text-blue @click="goBack(member.file[0].id, member.name)">退回</a>
           </td>
-          <td v-else colspan="3" >没 有 上 传</td>
+          <td v-else colspan="3">没 有 上 传</td>
         </tr>
       </tbody>
       <tfoot align="center" h-12>

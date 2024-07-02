@@ -10,15 +10,16 @@
         <h1>群组</h1>
       </template>
       <template #add>
-        <div flex text-xl cursor-pointer @click="addOpen()"><i-ic:baseline-add text-2xl /></div>
+        <div flex text-xl cursor-pointer @click="addOpen()"><i-ic:baseline-add text-3xl /></div>
         <asideGroupAddGroup :dialog="addDialogVisible" @close-dialog="addClose" @add-group="refresh" />
       </template>
       <template #content="{ isActive, timer }">
         <keep-alive>
           <asideGroupInfoItem v-if="isActive" :key="refreshTimer > timer ? refreshTimer : timer" />
         </keep-alive>
-      </template> </asideMainItem
-  ></el-scrollbar>
+      </template>
+    </asideMainItem>
+  </el-scrollbar>
 </template>
 <script setup lang="ts">
 import { SwitchAside } from "@/stores/switch/SwitchAside"

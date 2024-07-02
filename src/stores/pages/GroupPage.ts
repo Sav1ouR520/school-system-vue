@@ -1,6 +1,7 @@
 import { findGroupByGroupId } from "@/api/group"
 import { findMemberByUserId } from "@/api/member"
 import type { Group } from "@/interface/group"
+import router from "@/router"
 import { defineStore } from "pinia"
 type GroupPageInfo = {
   userRole: "user" | "admin"
@@ -51,7 +52,6 @@ export const GroupPage = defineStore("GroupPage", {
   },
   actions: {
     async getGroup() {
-      const router = useRouter()
       const group = GroupPage()
       const state = this.$state
       Promise.all([findGroupByGroupId(this.group.id), findMemberByUserId(this.group.id)])

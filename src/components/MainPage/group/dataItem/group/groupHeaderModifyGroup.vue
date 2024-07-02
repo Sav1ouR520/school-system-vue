@@ -1,19 +1,21 @@
 <template>
   <el-dialog v-model="dialogVisible" title="修改组" width="30rem" :before-close="send" draggable align-center>
-    <el-form hide-required-asterisk status-icon :rules="rules" :model="formGroup" size="large" ref="ruleFormRef" @submit.prevent>
+    <el-form hide-required-asterisk status-icon :rules="rules" :model="formGroup" size="large" ref="ruleFormRef"
+      @submit.prevent>
       <div flex>
         <el-form-item label="组名" prop="name">
           <el-input v-model="formGroup.name" maxlength="20"></el-input>
         </el-form-item>
-        <el-form-item label="组长" ml-4>
-          <el-select v-model="formGroup.owner" w-full placeholder="[组长转交可选项]">
+        <el-form-item label="组长" ml-4 flex-grow>
+          <el-select v-model="formGroup.owner" placeholder="[组长转交可选项]">
             <el-option v-for="member in members" :key="member.id" :label="member.name" :value="member.userId" />
           </el-select>
         </el-form-item>
       </div>
       <el-form-item label="头像">
         <div flex w-full items-center>
-          <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload" :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow>
+          <el-upload action="#" :limit="1" :auto-upload="false" :drag="true" accept="image/*" ref="upload"
+            :on-exceed="handleExceed" :on-change="handleChange" :show-file-list="false" flex-grow>
             <p text-blue>拖拽文件或点击上传['可选']</p>
           </el-upload>
           <div ml-2 flex items-center v-show="option.img !== ''">
@@ -21,7 +23,11 @@
           </div>
         </div>
         <div v-show="option.img !== ''" class="w-full h-80 mt-5 rounded overflow-hidden">
-          <vueCropper ref="cropper" :img="option.img" :outputSize="option.outputSize" :outputType="option.outputType" :canScale="option.canScale" :autoCrop="option.autoCrop" :autoCropWidth="option.autoCropWidth" :autoCropHeight="option.autoCropHeight" :canMoveBox="option.canMoveBox" :canMove="option.canMove" :centerBox="option.centerBox" :info="option.info" :fixedBox="option.fixedBox" :fixed="option.fixed" :mode="option.mode"> </vueCropper>
+          <vueCropper ref="cropper" :img="option.img" :outputSize="option.outputSize" :outputType="option.outputType"
+            :canScale="option.canScale" :autoCrop="option.autoCrop" :autoCropWidth="option.autoCropWidth"
+            :autoCropHeight="option.autoCropHeight" :canMoveBox="option.canMoveBox" :canMove="option.canMove"
+            :centerBox="option.centerBox" :info="option.info" :fixedBox="option.fixedBox" :fixed="option.fixed"
+            :mode="option.mode"> </vueCropper>
         </div>
       </el-form-item>
     </el-form>

@@ -1,33 +1,35 @@
 <template>
   <div flex items-center m-2 mt-0 h-10>
     <div flex items-center flex-grow font-bold h-8>
-      <span text-2xl>任务名:</span>
+      <span text-3xl>任务名:</span>
       <div flex items-center mt-1 px-1 ml-2 h-8 border-2 bg-black rounded text-white>
         <span font-bold>{{ data!.task.name }}</span>
       </div>
     </div>
-    <div flex items-center text-2 px-2 h-8 border-2 :class="data!.File?'bg-green':'bg-black'" rounded text-white>
+    <div flex items-center text-3 px-2 h-8 border-2 :class="data!.File ? 'bg-green' : 'bg-black'" rounded text-white>
       <span font-bold>{{ data!.File ? "完成" : "未完成" }}</span>
     </div>
   </div>
   <hr border-b-2 m-2 mb-4 />
   <div flex flex-col mx-2>
-    <div flex items-center text-2 px-2 h-10 border-2 rounded mb-4>
+    <div flex items-center text-3 px-2 h-10 border-2 rounded mb-4>
       <span w-15>创建者:</span>
       <span font-bold flex-grow>{{ data!.task.member.name }}</span>
     </div>
-    <div flex text-2 border-2 rounded mb-4>
+    <div flex text-3 border-2 rounded mb-4>
       <span w-15 mt-2.5 ml-2>任务简介:</span>
-      <textarea w-full ml-2 mt-2.5 min-h-6.5 h-40 font-bold focus:outline-none disabled bg-white :value="data!.task.introduce " />
+      <textarea w-full ml-2 mt-2.5 min-h-6.5 h-40 font-bold focus:outline-none disabled bg-white
+        :value="data!.task.introduce" />
     </div>
     <div flex w-full>
-      <div flex items-center pl-2 text-2 h-10 border-2 rounded mb-4 mr-4 min-w-40 class="w-1/3" v-if="data!.task.dataPath !== null">
+      <div flex items-center pl-2 text-3 h-10 border-2 rounded mb-4 mr-4 min-w-40 class="w-1/3"
+        v-if="data!.task.dataPath !== null">
         <span w-15>前置材料:</span>
         <span font-bold>
           <el-button type="primary" text @click="downloadPreFile()">点击下载</el-button>
         </span>
       </div>
-      <div flex items-center px-2 text-2 h-10 border-2 rounded mb-4 flex-grow>
+      <div flex items-center px-2 text-3 h-10 border-2 rounded mb-4 flex-grow>
         <span w-15>创建时间:</span>
         <span font-bold>{{ moment(data!.task.createTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
       </div>
@@ -37,21 +39,21 @@
     <div flex m-2 mb-4 items-center font-bold>
       <div flex-grow flex items-center>
         <span mr-1> 任务提交</span>
-        <span text-1 text-blue cursor-pointer v-show="formFile.hasFile" @click="cancelFile()">[一键取消文件]</span>
+        <span text-3 text-blue cursor-pointer v-show="formFile.hasFile" @click="cancelFile()">[一键取消文件]</span>
       </div>
-      <span v-if="data!.File" @click="downloadUploadFile()" text-1 text-blue cursor-pointer> 查看提交文件 </span>
+      <span v-if="data!.File" @click="downloadUploadFile()" text-3 text-blue cursor-pointer> 查看提交文件 </span>
     </div>
     <el-form :rules="rules" :model="formFile" ref="ruleFormRef" @submit.prevent>
       <el-form-item prop="hasFile" mx-2>
-        <el-upload flex flex-col mt-2 flex-grow action="#" ref="upload" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" :auto-upload="false" multiple drag>
+        <el-upload flex flex-col mt-2 flex-grow action="#" ref="upload" :file-list="fileList" :on-change="handleChange"
+          :on-remove="handleRemove" :auto-upload="false" multiple drag>
           <div flex justify-between text-blue>
             <div flex flex-grow items-center justify-center rounded-xl>
               <i-ep:upload-filled text-8.4 />
               <p>拖拽文件到此处或点击上传</p>
             </div>
           </div>
-        </el-upload></el-form-item
-      >
+        </el-upload></el-form-item>
       <div flex items-center m-2 h-10>
         <el-button type="primary" w-full @click="sumbit(ruleFormRef)">提交 / 修改</el-button>
       </div>

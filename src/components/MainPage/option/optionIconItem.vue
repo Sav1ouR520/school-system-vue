@@ -1,7 +1,7 @@
 <template>
   <div h-17.5 class="flex-center" @click="change">
     <div h-12.5 w-12.5 rounded-full hover:bg-gray-800 class="flex-center" cursor-pointer>
-      <a text-2xl :class="[icon, color()]"></a>
+      <a text-3xl :class="[icon, color()]"></a>
     </div>
   </div>
 </template>

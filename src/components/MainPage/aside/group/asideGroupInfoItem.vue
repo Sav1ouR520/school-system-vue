@@ -6,9 +6,9 @@
           <i-ic:baseline-image text-3xl />
         </el-avatar>
       </div>
-      <div flex-grow pl-2 text-gray-500 text-2>
+      <div flex-grow pl-2 text-gray-500 text-3>
         <div class="h-1/2" flex items-center font-bold>
-          <span flex-grow text-4 text-gray-700>{{ group.name }}</span>
+          <span flex-grow text-3 text-gray-700>{{ group.name }}</span>
           <span> {{ moment(group.createTime).format("YYYY-MM-DD") }}</span>
         </div>
         <div class="h-1/2" flex items-center font-bold>

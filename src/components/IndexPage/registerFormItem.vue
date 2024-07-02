@@ -1,6 +1,6 @@
 <template>
   <el-form @submit.prevent :rules="rules" status-icon ref="ruleFormRef" :model="user" size="large" label-position="top">
-    <el-form-item label="密码" prop="username">
+    <el-form-item label="账号" prop="username">
       <el-input v-model="user.username" placeholder="请输入用户名">
         <template #prefix>
           <i-ep-user></i-ep-user>
@@ -18,8 +18,7 @@
       </el-input>
     </el-form-item>
     <el-form-item label="验证码" prop="captcha" :error="captcha.codeErrorMeg" flex-grow>
-      <el-input class="no-radius" v-model="user.captcha" placeholder="请输入验证码" maxlength="4"
-        ><template #prefix>
+      <el-input class="no-radius" v-model="user.captcha" placeholder="请输入验证码" maxlength="4"><template #prefix>
           <i-ep-message></i-ep-message>
         </template>
       </el-input>
@@ -32,7 +31,8 @@
       </el-input>
     </el-form-item>
     <el-form-item label="确认密码" prop="repassword">
-      <el-input v-model="user.repassword" placeholder="再输入一次密码" type="password" maxlength="30" @keyup.enter="sumbit(ruleFormRef)">
+      <el-input v-model="user.repassword" placeholder="再输入一次密码" type="password" maxlength="30"
+        @keyup.enter="sumbit(ruleFormRef)">
         <template #prefix>
           <i-ep-lock></i-ep-lock>
         </template>

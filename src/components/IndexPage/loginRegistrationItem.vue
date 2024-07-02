@@ -5,8 +5,9 @@
         <div w-full h-full bg-cover class="images"></div>
       </transition>
       <transition appear appear-active-class="animate__animated animate__backInRight">
-        <div absolute flex flex-col justify-center items-center h-full lg:w-135 w-screen opacity-75 bg-white top-0 right-0 min-h-135>
-          <h1 font-bold text-center text-10 m-0>{{ title }}</h1>
+        <div absolute flex flex-col justify-center items-center h-full lg:w-135 w-screen opacity-75 bg-white top-0
+          right-0 min-h-135>
+          <h1 font-bold text-center text-30 m-0>{{ title }}</h1>
           <div mx-auto class="w-4/5">
             <slot name="form"></slot>
             <slot name="info"></slot>

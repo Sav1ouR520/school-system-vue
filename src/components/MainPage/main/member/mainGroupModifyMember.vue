@@ -2,13 +2,14 @@
   <el-dialog v-model="dialogVisible" width="25rem" :before-close="send" draggable align-center>
     <template #header="{ titleId }">
       <div flex items-center>
-        <el-avatar mr-1 :size="30" :src="formMember.icon">
+        <el-avatar mr-1 :size="30" v-if="formMember.icon" :src="'/data/user/' + formMember.icon">
           <i-ic:baseline-image text-sm />
         </el-avatar>
         <div :id="titleId">修改成员信息</div>
       </div>
     </template>
-    <el-form hide-required-asterisk status-icon :rules="rules" :model="formMember" size="large" ref="ruleFormRef" @submit.prevent>
+    <el-form hide-required-asterisk status-icon :rules="rules" :model="formMember" size="large" ref="ruleFormRef"
+      @submit.prevent>
       <el-form-item label="姓名" prop="name">
         <el-input v-model="formMember.name" />
       </el-form-item>

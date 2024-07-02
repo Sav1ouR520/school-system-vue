@@ -2,7 +2,7 @@
   <el-dialog v-model="dialogVisible" width="25rem" :before-close="send" draggable align-center>
     <template #header="{ titleId }">
       <div flex items-center>
-        <el-avatar mr-1 :size="30" :src="member.icon">
+        <el-avatar mr-1 :size="30" v-if="member.icon" :src="'/data/user/' + member.icon">
           <i-ic:baseline-image text-sm />
         </el-avatar>
         <div :id="titleId">成员信息</div>

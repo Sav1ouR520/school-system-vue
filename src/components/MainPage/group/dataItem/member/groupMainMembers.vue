@@ -1,11 +1,16 @@
 <template>
   <groupMainAddMember :dialog="addDialogVisible" @close-dialog="addClose" @add-member="refresh" />
-  <mainGroupModifyMember :dialog="modifyDialogVisible" @close-dialog="modifyClose" @modify-member="refresh" :memberId="memberId" />
+  <mainGroupModifyMember :dialog="modifyDialogVisible" @close-dialog="modifyClose" @modify-member="refresh"
+    :memberId="memberId" />
   <mainGroupCheckMember :dialog="checkDialogVisible" @close-dialog="checkClose" :memberId="memberId" />
-  <groupMainCard name="群成员" :num="members.length" :refresh="refreshData" :modify="modifyAcitve" :add="addFn" :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus" @change-modify-status="getModifyStatus">
+  <groupMainCard name="群成员" :num="members.length" :refresh="refreshData" :modify="modifyAcitve" :add="addFn"
+    :minus="deleteActive" :sumbit="sumbit" @change-delete-status="getDeleteStatus"
+    @change-modify-status="getModifyStatus">
     <template v-slot:list>
       <el-scrollbar>
-        <div items-center border border-transparent hover:border-current cursor-pointer :class="[deleteActive ? 'hover:bg-red-100' : '', modifyAcitve ? 'hover:bg-blue-100' : '', chooseList.includes(`${member.id}`) ? 'text-red' : 'text-black']" v-for="member in members" :key="member.id" @click="choose(`${member.id}`)">
+        <div items-center border border-transparent hover:border-current cursor-pointer
+          :class="[deleteActive ? 'hover:bg-red-100' : '', modifyAcitve ? 'hover:bg-blue-100' : '', chooseList.includes(`${member.id}`) ? 'text-red' : 'text-black']"
+          v-for="member in members" :key="member.id" @click="choose(`${member.id}`)">
           <div flex h-10 flex-grow px-2 justify-between items-center w-full>
             <div flex items-center>
               <el-avatar :size="30" :src="member.icon ? '/data/user/' + member.icon : null" @dragstart.prevent>
@@ -13,7 +18,7 @@
               </el-avatar>
               <span ml-2>{{ member.name }}</span>
             </div>
-            <i-ic:outline-account-circle text-2xl :class="member.role === 'admin' ? 'text-yellow' : ''" />
+            <i-ic:outline-account-circle text-3xl :class="member.role === 'admin' ? 'text-yellow' : ''" />
           </div>
         </div>
       </el-scrollbar>

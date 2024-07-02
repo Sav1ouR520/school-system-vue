@@ -13,7 +13,7 @@
       <el-button type="primary" @click="sumbit(ruleFormRef)">加入</el-button>
     </div>
     <template #footer>
-      <div flex justify-between text-1 text-gray>
+      <div flex justify-between text-3 text-gray>
         <div>目前只支持通过邀请码加入</div>
         <div>[使用小伙伴的邀请码加入吧]</div>
       </div>
